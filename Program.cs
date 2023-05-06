@@ -1,8 +1,11 @@
+using CyTool.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddSingleton<DB>();
+builder.Services.AddSingleton<sHome>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
