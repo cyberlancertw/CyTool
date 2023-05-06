@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "示範 CyLoading";
+}
+<script src="~/js/CyLoading.js" asp-append-version="true"></script>
+
+<label>秒數：<input type="number" value="3" id="delaySec"/></label>
+<button onclick="startLoading();">開始讀取</button>
+<script>
+    function startLoading(){
+        let sec = parseInt(document.getElementById('delaySec').value);
+        let millisec = sec == NaN ? 0 : sec * 1000;
+
+        // 開始讀取畫面
+        CyLoading.Start();
+
+        // 輸入秒數到後結束讀取畫面
+        window.setTimeout(CyLoading.Stop, millisec);
+    }
+</script>
