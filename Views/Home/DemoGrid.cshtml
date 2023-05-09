@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "示範 CyGrid";
+}
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+
+<label for="QName">產品名稱：</label><input type="text" id="QName" />
+<div id="GridDemo"></div>
+
+<script>
+    function foo(item, data){
+        console.log(foo);
+    }
+
+    const gridDemoSchema = {
+        PrimaryKey: 'ID',
+        ReadAfterRender: true,
+        Column: [
+            {
+                ColumnName: '產品編號',
+                DataName: 'ID',
+                Hidden: true
+            },
+            {
+                ColumnName: '產品名稱',
+                DataName: 'name',
+                SortType: 'Name'
+            },
+            {
+                ColumnName: '價格',
+                DataName: 'price',
+                SortType: 'Price',
+                Width: 150,
+                Align: 'right'
+            },
+            {
+                ColumnName: '註解',
+                DataName: 'memo',
+                SortType: "Memo",
+                Width: 250,
+                Align: 'left'
+            }
+        ],
+        Page: {
+            PageEnable: true,
+            PageSize: 10,
+            PageSizeSelect: [5, 10, 25]
+        },
+        Sort: {
+            SortDefaultEnable: true,
+            SortType: 'ID',
+            SortDesc: false
+        },
+        Event: {
+            Read: {
+                Url: '/Home/QueryProducts',
+                QueryData: 'ReadProducts()'
+            },
+            RowSelect: function(item, datas){ 
+                console.log(item);
+                console.log(datas);
+            },
+            //"RowDeselect": "RowDeselectTest(item.name);",
+            //"RowDoubleClick": "ContinueGameDb(item.characterID);",
+            //"ReadDone": "ReadDoneTest();"
+        },
+        MultiSelect: false
+    }
+
+    function ReadProducts(){
+        return {
+            'QName': document.getElementById('QName').value
+        }
+    }
+    window.addEventListener('load', function(){
+        CyGrid.Render('GridDemo', gridDemoSchema);
+    });
+</script>

@@ -1,4 +1,5 @@
 ﻿using CyTool.Models;
+using CyTool.Models.Ajax;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -25,10 +26,22 @@ namespace CyTool.Controllers
             return View();
         }
 
+        public IActionResult DemoGrid()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public JsonResult QueryProducts([FromBody]QueryProducts query)
+        {
+            SqlInfo info = new SqlInfo();
+            List<Product> qryResult = service.QueryProducts(query, info);
+            return Json(new { success = info.Success, data = qryResult, dataCount = 3 });
         }
     }
 }

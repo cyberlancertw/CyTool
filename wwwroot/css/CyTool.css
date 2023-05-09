@@ -1,0 +1,136 @@
+﻿/* CyGrid 表格 */
+.grid-table {
+    margin-left: auto;
+    margin-right:auto;
+    width: 95%;
+    border-collapse: collapse;
+}
+/* CyGrid 表格標題中的列 */
+.grid-thead > tr {
+    border-bottom-color: #000000;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+/* 表格標題列中的欄 */
+.grid-thead > tr > th {
+    text-align:left;
+    border-width: 0;
+    padding: 0.5rem 0.5rem;
+    line-height: 1.5;
+}
+/* 表格標題列欄位靠左 */
+.grid-th-left{
+    text-align: left;
+}
+/* 表格標題列欄位靠右 */
+.grid-th-right {
+    text-align: right;
+}
+/* 表格資料中的列 */
+.grid-tbody > tr {
+    border-bottom-color: #dee2e6;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+/* 表格資料列中的欄 */
+.grid-tbody > tr > td {
+    border-width: 0px;
+    padding: 0.5rem 0.5rem;
+    line-height: 1.5;
+}
+/* 無資料時顯示的欄 */
+.row-nodata {
+    text-align: center;
+}
+/* 被選取的列 */
+.row-selected {
+    background-color: #fedfe1;
+}
+/* 被選取列的懸停樣式 */
+.row-selected:hover {
+    background-color: #debfc1;
+}
+/* 表格資料中的列 */
+.grid-row {
+    cursor: pointer;
+
+}
+/* 表格資料列的懸停樣式 */
+.grid-row:hover {
+    background-color: #fedfe1;
+}
+/* 可排序的標題欄 */
+.sortable {
+    cursor: pointer;
+}
+/* 可排序的標題欄的懸停樣式 */
+.sortable:hover {
+    background-color: #ade0fe;
+}
+/* 分頁區 */
+.grid-page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+/* 分頁的範圍區 */
+.grid-page-range-block {
+}
+/* 分頁範圍區內的文字 */
+.grid-page-range {
+    color: #0000ff;
+}
+/* 分頁的中央按鈕區*/
+.grid-page-button-block {
+}
+/* 分頁的按鈕 */
+.grid-page-button {
+    line-height: 1.5;
+    padding: 2px 6px;
+    width: 2.2rem;
+    background-color: #e3e3e3;
+    border-radius: 0.3rem;
+    border: none;
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+}
+/* 分頁目前頁數的按鈕 */
+.grid-page-button-pagenow {
+    background-color: #b3b3b3;
+}
+/* 分頁可點選的按鈕 */
+.grid-page-button-clickable:hover {
+    cursor: pointer;
+    background-color: #c3c3c3;
+}
+/* 分頁跳至與筆數區 */
+.grid-page-info-block {
+    display: flex;
+    align-items: center;
+}
+/* 分頁跳至的下拉選單 */
+.grid-page-jump {
+    /*margin-left: 0.5rem;*/
+}
+/* 讀取畫面的背景*/
+.cy-loading-background {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+    opacity: .5;
+    z-index: 99998;
+    display: none;
+}
+
+/* 讀取畫面的前景 */
+.cy-loading-foreground {
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    z-index: 99999;
+    display: none;
+}

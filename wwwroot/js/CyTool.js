@@ -1,10 +1,21 @@
-﻿// 生成 Grid 區域
+﻿var CySchema = {};
+
+/**
+ * 生成 Grid 區域
+ * @param {string} GridID
+ * @param {object} GridSchema
+ */
 function CyGridRender(GridID, GridSchema) {
+    if (CySchema[GridID])
+        console.error('ID ' + GridID + ' 重覆使用');
+    else
+        CySchema[GridID] = GridSchema;
+
 
     let docFrag = document.createDocumentFragment();
     let domTable = document.createElement('table');
     docFrag.appendChild(domTable);
-    domTable.className = 'table';
+    domTable.className = 'grid-table';
     domTable.setAttribute('id', GridID + '-table');
     domTable.setAttribute('data-primarykey', GridSchema.PrimaryKey);
 
@@ -31,6 +42,7 @@ function CyGridRender(GridID, GridSchema) {
 
     let domThead = document.createElement('thead');
     domTable.appendChild(domThead);
+    domThead.className = 'grid-thead';
     domThead.setAttribute('id', GridID + '-thead');
 
     let domTr = document.createElement('tr');
@@ -105,16 +117,15 @@ function CyGridRender(GridID, GridSchema) {
         domPageButton.setAttribute('id', GridID + '-page-button-block');
         domPageButton.classList.add('grid-page-button-block');
 
-        PageButtonCreate(domPageButton, GridID, '|<', true);
-        PageButtonCreate(domPageButton, GridID, '<', true);
-        PageButtonCreate(domPageButton, GridID, '-', true);
-        PageButtonCreate(domPageButton, GridID, '', true);
-        PageButtonCreate(domPageButton, GridID, '1', false);
-        PageButtonCreate(domPageButton, GridID, '', true);
-        PageButtonCreate(domPageButton, GridID, '', true);
-        PageButtonCreate(domPageButton, GridID, '>', true);
-        PageButtonCreate(domPageButton, GridID, '>|', true);
-
+        CyPageButtonCreate(domPageButton, GridID, '|<', false);
+        CyPageButtonCreate(domPageButton, GridID, '<', true);
+        CyPageButtonCreate(domPageButton, GridID, '-', true);
+        CyPageButtonCreate(domPageButton, GridID, '', true);
+        CyPageButtonCreate(domPageButton, GridID, '1', false);
+        CyPageButtonCreate(domPageButton, GridID, '', true);
+        CyPageButtonCreate(domPageButton, GridID, '', true);
+        CyPageButtonCreate(domPageButton, GridID, '>', true);
+        CyPageButtonCreate(domPageButton, GridID, '>|', true);
 
         let domPageInfo = document.createElement('div');
         domPage.appendChild(domPageInfo);
@@ -168,20 +179,30 @@ function CyGridRender(GridID, GridSchema) {
 
     let domTbody = document.createElement('tbody');
     domTable.appendChild(domTbody);
+    domTbody.className = 'grid-tbody';
     domTbody.setAttribute('id', GridID + '-tbody');
-    document.getElementById(GridID).innerHTML = '';
-    document.getElementById(GridID).appendChild(docFrag);
+
+    let domGrid = document.getElementById(GridID);
+    while (domGrid.firstChild) {
+        domGrid.removeChild(domGrid.firstChild);
+    }
+    domGrid.appendChild(docFrag);
 
     if (GridSchema.ReadAfterRender) {
         CyGrid.Read(GridID);
     }
 }
 
-// 讀取資料送 AJAX
+/**
+ * 讀取資料送 AJAX
+ * @param {string} GridID
+ * @param {string} Url
+ * @param {object} QueryData
+ */
 function CyGridRead(GridID, Url, QueryData) {
 
     QueryData['Config'] = QueryCyGridConfig(GridID);
-    LoadingStart();
+    if(CyLoading) CyLoading.Start();
 
     fetch(Url, {
         method: 'POST',
@@ -192,18 +213,28 @@ function CyGridRead(GridID, Url, QueryData) {
         .then(result => {
             let config = document.getElementById(GridID + '-table').dataset;
             if (result.success) {
-                GridFill(GridID, result.data);
+                //處理表格資料繪製
+                CyGridFill(GridID, result.data);
                 if (config.pageenable == '1')
-                    PageFill(GridID, result.dataCount);
-                if (config.readdone)
-                    eval(config.readdone);
+                    //處理分頁繪製
+                    CyPageFill(GridID, result.dataCount);
+                if (schema && schema.Event && schema.Event.ReadDone) {
+                    schema.Event.ReadDone(result.data);
+                }
             }
         })
-        .then(LoadingStop).catch(LoadingStop);
+        .then(function () {
+            if (CyLoading) CyLoading.Stop();
+        }).catch(function () {
+            if (CyLoading) CyLoading.Stop();
+        });
 
 }
 
-// 讀取資料前取得 Grid 設定值
+/**
+ * 讀取資料前取得 Grid 設定值
+ * @param {string} GridID
+ */
 function QueryCyGridConfig(GridID) {
     let data = document.getElementById(GridID + '-table').dataset;
     let config = {};
@@ -215,9 +246,14 @@ function QueryCyGridConfig(GridID) {
     return config;
 }
 
-// 將資料放入 Grid 的 tbody 中
+/**
+ * 將資料放入 Grid 的 tbody 中
+ * @param {string} GridID
+ * @param {object} FillData
+ */
 function CyGridFill(GridID, FillData) {
     let config = document.getElementById(GridID + '-table').dataset;
+    let schema = CySchema[GridID];
     let docFrag = document.createDocumentFragment();
     let DataHiddens = document.getElementById(GridID + '-thead').dataset.hiddens.split(',');
     let DataVisibles = document.getElementById(GridID + '-thead').dataset.visibles.split(',');
@@ -253,10 +289,9 @@ function CyGridFill(GridID, FillData) {
                 let dataname = DataVisibles[k];
                 let domTd = document.createElement('td');
                 domTr.appendChild(domTd);
-                // 有給定 Getter 則用 Getter，可用 HTML 
-                let getter = document.getElementById(GridID + '-thead').querySelector('tr').children[k].dataset.getter;
-                if (getter) {
-                    domTd.innerHTML = eval(getter);
+                // 有給定 Getter 則用 Getter，
+                if (schema && schema.Column[k] && schema.Column[k].Getter) {
+                    domTd.appendChild(schema.Column[k].Getter(item, FillData));
                 }
                 else {
                     domTd.textContent = item[dataname];
@@ -276,8 +311,9 @@ function CyGridFill(GridID, FillData) {
                         selectedList.pop(item[config.primarykey]);
                         config.selected = selectedList.join(',');
                         // 取消選取的自訂 callback
-                        if (config.rowdeselect)
-                            eval(config.rowdeselect);
+                        if (schema && schema.Event && schema.Event.RowDeselect) {
+                            schema.Event.RowDeselect(item, FillData);
+                        }
                     }
                     else {
                         domTr.dataset.selected = '1';
@@ -286,8 +322,9 @@ function CyGridFill(GridID, FillData) {
                         selectedList.push(item[config.primarykey]);
                         config.selected = selectedList.join(',');
                         // 點擊選取的自訂 callback
-                        if (config.rowselect)
-                            eval(config.rowselect);
+                        if (schema && schema.Event && schema.Event.RowSelect) {
+                            schema.Event.RowSelect(item, FillData);
+                        }
                     }
                 });
             }
@@ -300,8 +337,9 @@ function CyGridFill(GridID, FillData) {
                         // 設定選到的主鍵
                         config.selected = '';
                         // 取消選取的自訂 callback
-                        if (config.rowdeselect)
-                            eval(config.rowdeselect);
+                        if (schema && schema.Event && schema.Event.RowSelect) {
+                            schema.Event.RowSelect(item, FillData);
+                        }
                     }
                     else {
                         // 解掉其他選取(todo:應該可以用config.primarykey來唯一指定不用跑迴圈)
@@ -315,8 +353,9 @@ function CyGridFill(GridID, FillData) {
                         // 設定選到的主鍵
                         config.selected = item[config.primarykey];
                         // 點擊選取的自訂 callback
-                        if (config.rowselect)
-                            eval(config.rowselect);
+                        if (schema && schema.Event && schema.Event.RowSelect) {
+                            schema.Event.RowSelect(item, FillData);
+                        }
                     }
                 });
             }
@@ -331,14 +370,21 @@ function CyGridFill(GridID, FillData) {
         }
     }
     // 清除之前的 tbody，放入新組成的
-    document.getElementById(GridID + '-tbody').innerHTML = '';
-    document.getElementById(GridID + '-tbody').appendChild(docFrag);
+    let domBody = document.getElementById(GridID + '-tbody');
+    while (domBody.firstChild) {
+        domBody.removeChild(domBody.firstChild);
+    }
+    domBody.appendChild(docFrag);
     config.selected = '';
 
 }
 
-// 讀取完資料整理分頁等元件
-function PageFill(GridID, DataCount) {
+/**
+ * 讀取完資料後，再整理分頁等元件
+ * @param {string} GridID
+ * @param {number} DataCount
+ */
+function CyPageFill(GridID, DataCount) {
     let config = document.getElementById(GridID + '-table').dataset;
     let pageSize = parseInt(config.pagesize);
     let pageCount = Math.ceil(DataCount / pageSize);
@@ -350,7 +396,7 @@ function PageFill(GridID, DataCount) {
     let lengthStart = rangeStart.toString().length;
     let rangeEnd = (pageNow + 1) == pageCount ? DataCount : pageSize * (pageNow + 1);
     let lengthEnd = rangeEnd.toString().length;
-    document.getElementById(GridID + '-page-range').innerHTML = '0'.repeat(maxLength - lengthStart) + rangeStart + ' - ' + "0".repeat(maxLength - lengthEnd) + rangeEnd + ' 共 ' + DataCount + ' 筆';
+    document.getElementById(GridID + '-page-range').textContent = '0'.repeat(maxLength - lengthStart) + rangeStart + ' - ' + '0'.repeat(maxLength - lengthEnd) + rangeEnd + ' 共 ' + DataCount + ' 筆';
 
     // 按鈕
     let buttons = document.getElementById(GridID + '-page-button-block').children;
@@ -358,49 +404,49 @@ function PageFill(GridID, DataCount) {
         let btn = buttons[i];
         switch (i) {
             case 0:
-                PageButtonInit(btn, 0, '|<', pageNow != 0);
+                CyPageButtonInit(btn, 0, '|<', pageNow != 0);
                 break;
             case 1:
-                PageButtonInit(btn, pageNow - 1, '<', pageNow != 0);
+                CyPageButtonInit(btn, pageNow - 1, '<', pageNow != 0);
                 break;
             case 2:
                 if (pageNow > 1)
-                    PageButtonInit(btn, pageNow - 2, pageNow - 1, true);
+                    CyPageButtonInit(btn, pageNow - 2, pageNow - 1, true);
                 else
-                    PageButtonInit(btn, pageNow - 2, '&nbsp;', false);
+                    CyPageButtonInit(btn, pageNow - 2, '　', false);
                 break;
             case 3:
                 if (pageNow > 0)
-                    PageButtonInit(btn, pageNow - 1, pageNow, true);
+                    CyPageButtonInit(btn, pageNow - 1, pageNow, true);
                 else
-                    PageButtonInit(btn, pageNow - 1, '&nbsp;', false);
+                    CyPageButtonInit(btn, pageNow - 1, '　', false);
                 break;
             case 4:
-                PageButtonInit(btn, pageNow, pageNow + 1, true);
+                CyPageButtonInit(btn, pageNow, pageNow + 1, true);
                 break;
             case 5:
                 if (pageNow < pageCount - 1)
-                    PageButtonInit(btn, pageNow + 1, pageNow + 2, true);
+                    CyPageButtonInit(btn, pageNow + 1, pageNow + 2, true);
                 else
-                    PageButtonInit(btn, pageNow + 1, '&nbsp;', false);
+                    CyPageButtonInit(btn, pageNow + 1, '　', false);
                 break;
             case 6:
                 if (pageNow < pageCount - 2)
-                    PageButtonInit(btn, pageNow + 2, pageNow + 3, true);
+                    CyPageButtonInit(btn, pageNow + 2, pageNow + 3, true);
                 else
-                    PageButtonInit(btn, pageNow + 2, '&nbsp; ', false);
+                    CyPageButtonInit(btn, pageNow + 2, '　', false);
                 break;
             case 7:
                 if (pageNow < pageCount - 1)
-                    PageButtonInit(btn, pageNow + 1, '>', true);
+                    CyPageButtonInit(btn, pageNow + 1, '>', true);
                 else
-                    PageButtonInit(btn, pageNow + 1, '>', false);
+                    CyPageButtonInit(btn, pageNow + 1, '>', false);
                 break;
             case 8:
                 if (pageNow < pageCount - 1)
-                    PageButtonInit(btn, pageCount - 1, '>|', true);
+                    CyPageButtonInit(btn, pageCount - 1, '>|', true);
                 else
-                    PageButtonInit(btn, pageCount - 1, '>|', false);
+                    CyPageButtonInit(btn, pageCount - 1, '>|', false);
                 break;
             default:
                 break;
@@ -415,15 +461,24 @@ function PageFill(GridID, DataCount) {
         docFragJump.append(opt);
     }
     let jump = document.getElementById(GridID + '-page-jump');
-    jump.innerHTML = ''
+    // 清空裡面的 node
+    while (jump.firstChild) {
+        jump.removeChild(jump.firstChild);
+    }
     jump.appendChild(docFragJump);
     jump.value = pageNow;
 }
 
-// 產生分頁按鈕
+/**
+ * 初步繪製時產生分頁按鈕
+ * @param {Node} ParentNode
+ * @param {string} GridID
+ * @param {string} Text
+ * @param {boolean} Clickable
+ */
 function CyPageButtonCreate(ParentNode, GridID, Text, Clickable) {
     let btn = document.createElement('button');
-    btn.innerHTML = Text;
+    btn.textContent = Text;
     btn.classList.add('grid-page-button');
     if (Clickable) {
         btn.classList.add('grid-page-button-clickable');
@@ -436,9 +491,16 @@ function CyPageButtonCreate(ParentNode, GridID, Text, Clickable) {
     ParentNode.appendChild(btn);
 }
 
+/**
+ * 重繪 CyGrid 分頁的跳轉區域的按鈕
+ * @param {object} ButtonNode
+ * @param {number} ToPage
+ * @param {string} Text
+ * @param {boolean} Enable
+ */
 function CyPageButtonInit(ButtonNode, ToPage, Text, Enable) {
     ButtonNode.setAttribute('data-topage', ToPage);
-    ButtonNode.innerHTML = Text;
+    ButtonNode.textContent = Text;
     if (Enable) {
         ButtonNode.removeAttribute('disabled');
         ButtonNode.classList.add('grid-page-button-clickable');
@@ -451,8 +513,15 @@ function CyPageButtonInit(ButtonNode, ToPage, Text, Enable) {
 
 
 
-
+/**
+ * CyGrid 控制物件
+ * */
 const CyGrid = {
+    /**
+     * 在指定位置繪出表格元件
+     * @param {any} GridID
+     * @param {any} GridSchema
+     */
     Render: function (GridID, GridSchema) {
         if (!GridID || !GridSchema) {
             console.error('缺少 GridID 或 GridShcema');
@@ -464,19 +533,37 @@ const CyGrid = {
         }
         CyGridRender(GridID, GridSchema);
     },
+    /**
+     * 表格元件讀取資料
+     * @param {any} GridID
+     */
     Read: function (GridID) {
         let readurl = document.getElementById(GridID + '-table').dataset.readurl;
         let readquerydata = document.getElementById(GridID + '-table').dataset.readquerydata;
         let datas = eval(readquerydata);
         CyGridRead(GridID, readurl, datas);
     },
+    /**
+     * 取得表格元件所選取的列編號
+     * @param {string} GridID
+     */
     Selected: function (GridID) {
         return document.getElementById(GridID + '-table').dataset.selected;
     },
+    /**
+     * 跳至表格元件的指定分頁
+     * @param {string} GridID
+     * @param {number} ToPage
+     */
     PageJump: function (GridID, ToPage) {
         document.getElementById(GridID + '-table').dataset.pagenow = ToPage;
         this.Read(GridID);
     },
+    /**
+     * 取得表格元件該主鍵的資料
+     * @param {string} GridID
+     * @param {string} PrimaryKey
+     */
     GetRowData: function (GridID, PrimaryKey) {
         let rows = document.getElementById(GridID + '-tbody').children;
         let primarykey = document.getElementById(GridID + '-table').dataset.primarykey.toLowerCase();
@@ -490,3 +577,125 @@ const CyGrid = {
     }
 }
 
+
+
+/**
+ * 讀取晝面初始化
+ * */
+function CyLoadingInit() {
+    // 不存在 div#divLoading 就創一個放在 body 下第一個
+    if (!document.getElementById('divLoading')) {
+        let docFrag = document.createDocumentFragment();
+        let divLoading = document.createElement('div');
+        divLoading.setAttribute('id', 'divLoading');
+        docFrag.appendChild(divLoading);
+        document.body.insertBefore(docFrag, document.body.childNodes[0]);
+        // 創完再跑一次
+        CyLoadingInit();
+        return;
+    }
+    let xmls = 'http://www.w3.org/2000/svg';
+    let w = Math.min(window.outerWidth * 0.1, window.outerHeight * 0.1);
+    if (w < 25) w = 25;
+    let r1 = w * 0.05, r2 = w * 0.35, r3 = w * 0.45;
+    let x1 = w / 2, y1 = r1, x2 = w / 2, y2 = r1 * 3, x3 = x1 + r2, y3 = w / 2, x4 = w - r1, y4 = w / 2;
+    let d = `M${x1} ${y1} A${r1} ${r1},0 1 1 ${x2} ${y2} A${r2} ${r2},0 1 0 ${x3} ${y3} A${r1} ${r1},0 1 1 ${x4} ${y4} A${r3} ${r3},0 1 1 ${x1} ${y1} Z`;
+
+    let docFrag = document.createDocumentFragment();
+    let docBg = document.createElement('div');
+    docFrag.appendChild(docBg);
+    docBg.setAttribute('id', 'loadingBackground');
+    docBg.className = 'cy-loading-background';
+    let docFg = document.createElement('div');
+    docFrag.appendChild(docFg);
+    docFg.setAttribute('id', 'loadingForeground');
+    docFg.className = 'cy-loading-foreground';
+    docFg.setAttribute('width', w);
+    docFg.setAttribute('height', w);
+    docFg.style.transform = 'translate(-' + x1 + 'px, -' + x1 + 'px)';
+    let domSvg = document.createElementNS(xmls, 'svg');
+    docFg.appendChild(domSvg);
+    domSvg.setAttribute('width', w);
+    domSvg.setAttribute('height', w);
+    let domDefs = document.createElementNS(xmls, 'defs');
+    domSvg.appendChild(domDefs);
+    let domGradient = document.createElementNS(xmls, 'radialGradient');
+    domDefs.appendChild(domGradient);
+    domGradient.setAttribute('id', 'loadingGradient');
+    domGradient.setAttribute('fx', '.92');
+    domGradient.setAttribute('fy', '.56');
+    domGradient.setAttribute('cx', '.79');
+    domGradient.setAttribute('cy', '.6');
+    domGradient.setAttribute('r', '1');
+    let domStop1 = document.createElementNS(xmls, 'stop');
+    domGradient.appendChild(domStop1);
+    domStop1.setAttribute('offset', '.095');
+    domStop1.setAttribute('stop-color', '#e4e4e4');
+    let domStop2 = document.createElementNS(xmls, 'stop');
+    domGradient.appendChild(domStop2);
+    domStop2.setAttribute('offset', '.295');
+    domStop2.setAttribute('stop-color', '#808080');
+    let domStop3 = document.createElementNS(xmls, 'stop');
+    domGradient.appendChild(domStop3);
+    domStop3.setAttribute('offset', '.685');
+    domStop3.setAttribute('stop-color', '#101010');
+    let domG = document.createElementNS(xmls, 'g');
+    domSvg.appendChild(domG);
+    domG.setAttribute('id', 'loadingSVG');
+    domG.setAttribute('data-center', x1);
+    domG.setAttribute('transform', 'rotate(0 ' + x1 + ' ' + x1 + ')');
+    let domPath = document.createElementNS(xmls, 'path');
+    domG.appendChild(domPath);
+    domPath.setAttribute('d', d);
+    domPath.setAttribute('fill', 'url(#loadingGradient)');
+    document.getElementById('divLoading').appendChild(docFrag);
+}
+
+/**
+ * 旋轉讀取畫面
+  * @param {number} degree
+ */
+function CyLoadingRotate(degree) {
+    let loadingSVG = document.getElementById('loadingSVG');
+    // 非開啟則不動，退出
+    if (!loadingSVG.dataset.active) return;
+    // 每次順時針旋轉 8 度
+    degree += 8;
+    let center = loadingSVG.dataset.center;
+    let rotateStr = `rotate(${degree} ${center} ${center})`;
+    loadingSVG.setAttribute('transform', rotateStr);
+    // 五十分之一秒旋轉一次
+    setTimeout(function () {
+        CyLoadingRotate(degree % 360);
+    }, 20);
+}
+
+/**
+ * CyLoading 控制物件
+ * */
+const CyLoading = {
+    /**
+     * 啟動讀取中畫面
+     * */
+    Start: function () {
+        let loadingSVG = document.getElementById('loadingSVG');
+        // 已開啟則不動，退出
+        if (loadingSVG.dataset.active) return;
+
+        // 開啟
+        loadingSVG.setAttribute('data-active', 1);
+        document.getElementById('loadingBackground').style.display = 'block';
+        document.getElementById('loadingForeground').style.display = 'block';
+        CyLoadingRotate(0);
+    },
+    /**
+     * 關閉讀取畫面
+     * */
+    Stop: function () {
+        document.getElementById('loadingBackground').style.display = 'none';
+        document.getElementById('loadingForeground').style.display = 'none';
+        document.getElementById('loadingSVG').removeAttribute('data-active');
+    }
+}
+
+window.addEventListener('load', CyLoadingInit);
