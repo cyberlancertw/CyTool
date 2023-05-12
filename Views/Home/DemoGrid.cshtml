@@ -5,7 +5,7 @@
 <script src="~/js/CyTool.js" asp-append-version="true"></script>
 
 
-<label for="QName">產品名稱：</label><input type="text" id="QName" />
+<label for="QName">學生名稱：</label><input type="text" id="QName" />
 <div id="GridDemo"></div>
 
 <script>
@@ -14,38 +14,86 @@
     }
 
     const gridDemoSchema = {
-        PrimaryKey: 'ID',
+        PrimaryKey: 'id',
         ReadAfterRender: true,
         Column: [
             {
-                ColumnName: '產品編號',
-                DataName: 'ID',
+                ColumnName: '學號',
+                DataName: 'id',
                 Hidden: true
             },
             {
-                ColumnName: '產品名稱',
+                ColumnName: '姓名',
                 DataName: 'name',
                 SortType: 'Name'
             },
             {
-                ColumnName: '價格',
-                DataName: 'price',
-                SortType: 'Price',
-                Width: 150,
+                ColumnName: '性別',
+                DataName: 'sex',
+                SortType: 'Sex',
+                Width: 80,
+                Align: 'right',
+                Getter: function(item, datas){
+                    if(item.sex == 'F') return '女';
+                    else if(item.sex == 'M') return '男';
+                    else return '';
+                }
+            },
+            {
+                ColumnName: '生日',
+                DataName: 'birthday',
+                SortType: "Birthday",
+                Width: 250,
+                Align: 'left',
+                Getter: function(item){
+                    let dt = new Date(item.birthday);
+                    return dt.getFullYear() + '年' + (dt.getMonth() + 1) + '月' + dt.getDate() + '日';
+                }
+            },
+            {
+                ColumnName: '學期成績',
+                DataName: 'score',
+                SortType: "Score",
+                Width: 250,
+                Align: 'left'
+            },
+            {
+                ColumnName: '狀態',
+                DataName: 'status',
+                Align: 'left',
+                Getter: function(item, datas){
+                    let span = document.createElement('span');
+                    if(item.score < 60){
+                        span.setAttribute('style', 'color: red;font-weight: 900;');
+                        span.textContent = '不及格';
+                    }
+                    else{
+                        span.setAttribute('style', 'color: blue;;');
+                        span.textContent = '及格';
+                    }
+                    return span;
+                }
+            },
+            {
+                ColumnName: '身高',
+                DataName: 'height',
+                SortType: "Height",
+                Width: 250,
                 Align: 'right'
             },
             {
-                ColumnName: '註解',
-                DataName: 'memo',
-                SortType: "Memo",
+                ColumnName: '體重',
+                DataName: 'weight',
+                SortType: "Weight",
                 Width: 250,
-                Align: 'left'
+                Align: 'right'
             }
         ],
         Page: {
-            PageEnable: true,
+            Enable: true,
             PageSize: 10,
-            PageSizeSelect: [5, 10, 25]
+            PageSizeSelect: [5, 10, 25],
+            PositionUp: true
         },
         Sort: {
             SortDefaultEnable: true,
@@ -54,8 +102,8 @@
         },
         Event: {
             Read: {
-                Url: '/Home/QueryProducts',
-                QueryData: 'ReadProducts()'
+                Url: '/Home/QueryStudents',
+                QueryData: ReadStudents
             },
             RowSelect: function(item, datas){ 
                 console.log(item);
@@ -68,7 +116,7 @@
         MultiSelect: false
     }
 
-    function ReadProducts(){
+    function ReadStudents(){
         return {
             'QName': document.getElementById('QName').value
         }

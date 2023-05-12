@@ -11,7 +11,6 @@ function CyGridRender(GridID, GridSchema) {
     else
         CySchema[GridID] = GridSchema;
 
-
     let docFrag = document.createDocumentFragment();
     let domTable = document.createElement('table');
     docFrag.appendChild(domTable);
@@ -28,7 +27,6 @@ function CyGridRender(GridID, GridSchema) {
     if (GridSchema.Event) {
         if (GridSchema.Event.Read) {
             domTable.setAttribute('data-readurl', GridSchema.Event.Read.Url);
-            domTable.setAttribute('data-readquerydata', GridSchema.Event.Read.QueryData);
         }
         if (GridSchema.Event.RowSelect)
             domTable.setAttribute('data-rowselect', GridSchema.Event.RowSelect);
@@ -47,7 +45,7 @@ function CyGridRender(GridID, GridSchema) {
 
     let domTr = document.createElement('tr');
     domThead.appendChild(domTr);
-    let hiddens = [], visibles = [], getters = [];
+    let hiddens = [], visibles = [];
     for (let i = 0; i < GridSchema.Column.length; i++) {
         let item = GridSchema.Column[i];
         if (item.Hidden) {
@@ -61,8 +59,7 @@ function CyGridRender(GridID, GridSchema) {
                 domTh.setAttribute('style', 'width:' + item.Width + 'px');
 
             visibles.push(item.DataName);
-            if (item.Getter)
-                domTh.setAttribute('data-getter', item.Getter);
+
             // 有給定 SortType 表示可排序
             if (item.SortType) {
                 domTh.classList.add('sortable');
@@ -93,13 +90,16 @@ function CyGridRender(GridID, GridSchema) {
         domThead.setAttribute('data-visibles', visibles.join(','));
 
     // 分頁設定
-    if (GridSchema.Page && GridSchema.Page.PageEnable) {
-        domTable.setAttribute('data-pageenable', GridSchema.Page.PageEnable ? '1' : '0');
+    if (GridSchema.Page && GridSchema.Page.Enable) {
+        domTable.setAttribute('data-pageenable', GridSchema.Page.Enable ? '1' : '0');
         domTable.setAttribute('data-pagenow', '0');
         domTable.setAttribute('data-pagesize', GridSchema.Page.PageSize);
 
         let domPage = document.createElement('div');
-        docFrag.insertBefore(domPage, docFrag.childNodes[0]);
+        if (GridSchema.Page.PositionUp)
+            docFrag.insertBefore(domPage, docFrag.childNodes[0]);
+        else
+            docFrag.appendChild(domPage);
         domPage.setAttribute('id', GridID + '-page');
         domPage.classList.add('grid-page');
 
@@ -117,7 +117,7 @@ function CyGridRender(GridID, GridSchema) {
         domPageButton.setAttribute('id', GridID + '-page-button-block');
         domPageButton.classList.add('grid-page-button-block');
 
-        CyPageButtonCreate(domPageButton, GridID, '|<', false);
+        CyPageButtonCreate(domPageButton, GridID, '|<', true);
         CyPageButtonCreate(domPageButton, GridID, '<', true);
         CyPageButtonCreate(domPageButton, GridID, '-', true);
         CyPageButtonCreate(domPageButton, GridID, '', true);
@@ -202,7 +202,7 @@ function CyGridRender(GridID, GridSchema) {
 function CyGridRead(GridID, Url, QueryData) {
 
     QueryData['Config'] = QueryCyGridConfig(GridID);
-    if(CyLoading) CyLoading.Start();
+    CyLoading.Start();
 
     fetch(Url, {
         method: 'POST',
@@ -211,22 +211,30 @@ function CyGridRead(GridID, Url, QueryData) {
     })
         .then(res => res.json())
         .then(result => {
-            let config = document.getElementById(GridID + '-table').dataset;
+            //let config = document.getElementById(GridID + '-table').dataset;
+            let schema = CySchema[GridID];
             if (result.success) {
                 //處理表格資料繪製
                 CyGridFill(GridID, result.data);
-                if (config.pageenable == '1')
+                //if (config.pageenable == '1')
+                console.log(schema);
+                if (schema.Page && schema.Page.Enable) {
+                    if(result.data && result.data[0] && result.data[0].dataCount)
                     //處理分頁繪製
-                    CyPageFill(GridID, result.dataCount);
+                    CyPageFill(GridID, parseInt(result.data[0].dataCount));
+                }
                 if (schema && schema.Event && schema.Event.ReadDone) {
                     schema.Event.ReadDone(result.data);
                 }
             }
+            else {
+                alert('!?');// alert
+            }
         })
         .then(function () {
-            if (CyLoading) CyLoading.Stop();
+            CyLoading.Stop();
         }).catch(function () {
-            if (CyLoading) CyLoading.Stop();
+            CyLoading.Stop();
         });
 
 }
@@ -271,7 +279,6 @@ function CyGridFill(GridID, FillData) {
     }
     // 有資料則一列列塞入
     else {
-        let isMultiSelect = config.multiselect == '1';
         for (let i = 0, n = FillData.length; i < n; i++) {
             let item = FillData[i];
             let domTr = document.createElement('tr');
@@ -279,26 +286,35 @@ function CyGridFill(GridID, FillData) {
             domTr.setAttribute('data-selected', '0');
             domTr.setAttribute('data-data', JSON.stringify(item));
             domTr.classList.add('grid-row');
-            // 隱藏的屬性放入 tr 的 dataset 中，之後可用
-            for (let j = 0; j < s; j++) {
-                let dataname = DataHiddens[j];
-                domTr.setAttribute('data-' + dataname, item[dataname]);
-            }
-            // 可見的屬性用 td 顯示
-            for (let k = 0; k < t; k++) {
-                let dataname = DataVisibles[k];
-                let domTd = document.createElement('td');
-                domTr.appendChild(domTd);
-                // 有給定 Getter 則用 Getter，
-                if (schema && schema.Column[k] && schema.Column[k].Getter) {
-                    domTd.appendChild(schema.Column[k].Getter(item, FillData));
+            for (let j = 0, c = schema.Column.length; j < c; j++) {
+                let dataname = schema.Column[j].DataName;
+                // 隱藏的屬性放入 tr 的 dataset 中，之後可用
+                if (schema.Column[j].Hidden) {
+                    domTr.setAttribute('data-' + dataname, item[dataname]);
                 }
+                // 可見的屬性用 td 顯示
                 else {
-                    domTd.textContent = item[dataname];
+                    let domTd = document.createElement('td');
+                    domTr.appendChild(domTd);
+                    // 有給定 Getter，用 Getter function 取得 node 或 text
+                    if (schema.Column[j].Getter) {
+                        let getterResult = schema.Column[j].Getter(item, FillData);
+                        // 是 createElement 或 createDocumentFragment 等 node 則用 appendChild
+                        if (getterResult instanceof Node)
+                            domTd.appendChild(getterResult);
+                        // 是一般文字
+                        else
+                            domTd.textContent = getterResult;
+                    }
+                    // 沒有 Getter 是一般文字則放入 TD 裡
+                    else {
+                        domTd.textContent = item[dataname];
+                    }
                 }
             }
+
             // 多選的點擊
-            if (isMultiSelect) {
+            if (schema.MultiSelect) {
                 domTr.addEventListener('click', function () {
                     let selectedList = config.selected.split(',');
                     // 從空的開始選取的處理
@@ -386,10 +402,13 @@ function CyGridFill(GridID, FillData) {
  */
 function CyPageFill(GridID, DataCount) {
     let config = document.getElementById(GridID + '-table').dataset;
+    console.log(config);
     let pageSize = parseInt(config.pagesize);
+    console.log(pageSize);
     let pageCount = Math.ceil(DataCount / pageSize);
+    console.log(pageCount);
     let pageNow = parseInt(config.pagenow);
-
+    console.log(pageNow);
     // 範圍
     let maxLength = DataCount.toString().length;
     let rangeStart = pageNow * pageSize + 1;
@@ -519,8 +538,8 @@ function CyPageButtonInit(ButtonNode, ToPage, Text, Enable) {
 const CyGrid = {
     /**
      * 在指定位置繪出表格元件
-     * @param {any} GridID
-     * @param {any} GridSchema
+     * @param {string} GridID
+     * @param {object} GridSchema
      */
     Render: function (GridID, GridSchema) {
         if (!GridID || !GridSchema) {
@@ -535,13 +554,18 @@ const CyGrid = {
     },
     /**
      * 表格元件讀取資料
-     * @param {any} GridID
+     * @param {string} GridID
      */
     Read: function (GridID) {
-        let readurl = document.getElementById(GridID + '-table').dataset.readurl;
-        let readquerydata = document.getElementById(GridID + '-table').dataset.readquerydata;
-        let datas = eval(readquerydata);
-        CyGridRead(GridID, readurl, datas);
+        let schema = CySchema[GridID];
+        if (schema.Event.Read.Url) {
+            if (schema.Event.Read.QueryData) {
+                CyGridRead(GridID, schema.Event.Read.Url, schema.Event.Read.QueryData());
+            }
+            else {
+                CyGridRead(GridID, schema.Event.Read.Url, null);
+            }
+        }
     },
     /**
      * 取得表格元件所選取的列編號
@@ -556,6 +580,7 @@ const CyGrid = {
      * @param {number} ToPage
      */
     PageJump: function (GridID, ToPage) {
+        console.log(GridID, ToPage);
         document.getElementById(GridID + '-table').dataset.pagenow = ToPage;
         this.Read(GridID);
     },

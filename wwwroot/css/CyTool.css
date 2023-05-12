@@ -69,6 +69,7 @@
 }
 /* 分頁區 */
 .grid-page {
+    margin: 1rem 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -125,7 +126,6 @@
     z-index: 99998;
     display: none;
 }
-
 /* 讀取畫面的前景 */
 .cy-loading-foreground {
     left: 50%;
@@ -133,4 +133,8 @@
     position: absolute;
     z-index: 99999;
     display: none;
+}
+/* 藍色按鈕 */
+.btn-blue{
+
 }

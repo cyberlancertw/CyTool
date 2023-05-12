@@ -37,11 +37,12 @@ namespace CyTool.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public JsonResult QueryProducts([FromBody]QueryProducts query)
+        [HttpPost]
+        public JsonResult QueryStudents([FromBody]QueryStudents query)
         {
             SqlInfo info = new SqlInfo();
-            List<Product> qryResult = service.QueryProducts(query, info);
-            return Json(new { success = info.Success, data = qryResult, dataCount = 3 });
+            List<Student> qryResult = service.QueryStudents(query, info);
+            return Json(new { success = info.Success, data = qryResult });
         }
     }
 }

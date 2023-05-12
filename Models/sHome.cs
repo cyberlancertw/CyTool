@@ -14,16 +14,20 @@ namespace CyTool.Models
             env = environment;
         }
 
-        public List<Product> QueryProducts(Ajax.QueryProducts query, SqlInfo info)
+        public List<Student> QueryStudents(Ajax.QueryStudents query, SqlInfo info)
         {
-            List<Product> result = null;
+            List<Student> result = null;
             try
             {
                 using(var conn = db.Connection())
                 {
+                    string sql = "SELECT [ID],[Name],[Sex],[Birthday],[Height],[Weight],[Score] FROM dbo.Students";
+                    sql = CyTool.QueryWithPage(sql, query.Config);
+                    //DynamicParameters para = new DynamicParameters();
+                    //para.Add("name", query.QName.Trim());
 
-                    string sql = "SELECT [ID],[Name],[Price],[Memo] FROM dbo.Products";
-                    result = conn.Query<Product>(sql).ToList();
+                    //result = conn.Query<Student>(sql).ToList();
+                    result = conn.Query<Student>(sql).ToList();
                     info.Success = true;
                 }
             }
