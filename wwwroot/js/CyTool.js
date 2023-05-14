@@ -1,4 +1,171 @@
-﻿var CySchema = {};
+﻿/* Author: cyberlancer
+ * https://github.com/cyberlancertw/CyTool */
+
+var CySchema = {};
+
+/**
+ * 分析 CyModal 傳入 Size 取得要繪製的彈窗寬與高
+ * @param {string} Size
+ */
+function CyModalCheckWidthHeight(Size) {
+    let WidthHeight = [];
+    // 傳入 Size 是自訂寬高
+    if (Size.indexOf('*') > -1) {
+        let wh = Size.split('*');
+        if (wh.length != 2) {
+            console.error('CyModal 傳入 Size 不符 x*y 字串規則');
+            return;
+        }
+        WidthHeight[0] = parseInt(wh[0]);
+        WidthHeight[1] = parseInt(wh[1]);
+        if (isNaN(WidthHeight[0]) || isNaN(WidthHeight[1])) {
+            console.error('CyModal 傳入 Size 不符 x*y 字串規則');
+            return;
+        }
+    }
+    // 使用 XS, S, M, L, XL, XXL 大小
+    else {
+        switch (Size) {
+            case 'XS': WidthHeight[0] = 250; WidthHeight[1] = 200; break;
+            case 'S': WidthHeight[0] = 300; WidthHeight[1] = 250; break;
+            case 'M': WidthHeight[0] = 450; WidthHeight[1] = 300; break;
+            case 'L': WidthHeight[0] = 500; WidthHeight[1] = 400; break;
+            case 'XL': WidthHeight[0] = 600; WidthHeight[1] = 450; break;
+            case 'XXL': WidthHeight[0] = 800; WidthHeight[1] = 600; break;
+            default: console.error('CyModal 傳入 Size 須為 XS,S,M,L,XL,XXL 之一'); return;
+        }
+    }
+    return WidthHeight;
+}
+
+/**
+ * 繪製 CyModal.Alert 
+ * @param {any} Message
+ * @param {number} width
+ * @param {number} height
+ * @param {string} Title
+ * @param {string} Text
+ * @param {function} Callback
+ */
+function CyModalAlertRender(Message, Width, Height, Title, Text, Callback) {
+    let docFrag = document.createDocumentFragment();
+    let divModalAlert = document.createElement('div');
+    docFrag.appendChild(divModalAlert);
+    divModalAlert.className = 'cy-modal-alert';
+    divModalAlert.setAttribute('id', 'divModalAlert');
+    let cyModalBg = document.createElement('div');
+    divModalAlert.appendChild(cyModalBg);
+    cyModalBg.className = 'cy-modal-background';
+    let alertFg = document.createElement('div');
+    divModalAlert.appendChild(alertFg);
+    alertFg.className = 'cy-modal-foreground';
+    alertFg.setAttribute('style', 'width:' + Width + 'px;height:' + Height + 'px;');
+
+    let alertContent = document.createElement('div');
+    alertFg.appendChild(alertContent);
+    alertContent.className = 'cy-modal-content';
+
+    let alertTitle = document.createElement('div');
+    alertContent.appendChild(alertTitle);
+    alertTitle.className = 'cy-modal-title';
+    alertTitle.appendChild(document.createTextNode(Title));
+
+    let alertMain = document.createElement('div');
+    alertContent.appendChild(alertMain);
+    alertMain.className = 'cy-modal-main';
+    // 是 DocumentFragment 或 DomElemnet 就附加上去
+    if (Message instanceof Node) alertMain.appendChild(Message);
+    // 字串則用 text node 放進去
+    else if (typeof Message === 'string') alertMain.appendChild(document.createTextNode(Message));
+
+    let alertFooter = document.createElement('div');
+    alertContent.appendChild(alertFooter);
+    alertFooter.className = 'cy-modal-alert-footer';
+
+    let alertButton = document.createElement('button');
+    alertFooter.appendChild(alertButton);
+    alertButton.setAttribute('id', 'CyAlertButton');
+    alertButton.className = 'cy-button cy-modal-alert-button';
+    alertButton.appendChild(document.createTextNode(Text));
+    alertButton.addEventListener('click', function () {
+        // 移除本身 div
+        document.getElementById('divModalAlert').remove();
+        // 有給定按確認後的 callback function 則執行
+        if (Callback && typeof Callback === 'function')
+            Callback();
+    });
+    document.body.insertBefore(docFrag, document.body.childNodes[0]);
+    // 繪製完成就 focus 在確認按鈕上
+    document.getElementById('CyAlertButton').focus();
+
+}
+
+
+function CyModalConfirmRender(Message, Width, Height, Title, CallbackOk, TextOk, TextNo, CallbackNo) {
+    let docFrag = document.createDocumentFragment();
+    let divModalConfirm = document.createElement('div');
+    docFrag.appendChild(divModalConfirm);
+    divModalConfirm.className = 'cy-modal-confirm';
+    divModalConfirm.setAttribute('id', 'divModalConfirm');
+    let cyModalBg = document.createElement('div');
+    divModalConfirm.appendChild(cyModalBg);
+    cyModalBg.className = 'cy-modal-background';
+    let confirmFg = document.createElement('div');
+    divModalConfirm.appendChild(confirmFg);
+    confirmFg.className = 'cy-modal-foreground';
+    confirmFg.setAttribute('style', 'width:' + Width + 'px;height:' + Height + 'px;');
+
+    let confirmContent = document.createElement('div');
+    confirmFg.appendChild(confirmContent);
+    confirmContent.className = 'cy-modal-content';
+
+    let confirmTitle = document.createElement('div');
+    confirmContent.appendChild(confirmTitle);
+    confirmTitle.className = 'cy-modal-title';
+    confirmTitle.appendChild(document.createTextNode(Title));
+
+    let confirmMain = document.createElement('div');
+    confirmContent.appendChild(confirmMain);
+    confirmMain.className = 'cy-modal-main';
+    // 是 DocumentFragment 或 DomElemnet 就附加上去
+    if (Message instanceof Node) confirmMain.appendChild(Message);
+    // 字串則用 text node 放進去
+    else if (typeof Message === 'string') confirmMain.appendChild(document.createTextNode(Message));
+
+    let confirmFooter = document.createElement('div');
+    confirmContent.appendChild(confirmFooter);
+    confirmFooter.className = 'cy-modal-confirm-footer';
+
+    let confirmButtonOk = document.createElement('button');
+    confirmFooter.appendChild(confirmButtonOk);
+    confirmButtonOk.setAttribute('id', 'CyConfirmButtonOk');
+    confirmButtonOk.className = 'cy-button cy-modal-confirm-button-ok';
+    confirmButtonOk.appendChild(document.createTextNode(TextOk));
+    confirmButtonOk.addEventListener('click', function () {
+        // 移除本身 div
+        document.getElementById('divModalConfirm').remove();
+        // 有給定按確認後的 callback function 則執行
+        if (CallbackOk && typeof CallbackOk === 'function')
+            CallbackOk();
+    });
+
+    let confirmButtonNo = document.createElement('button');
+    confirmFooter.appendChild(confirmButtonNo);
+    confirmButtonNo.setAttribute('id', 'CyConfirmButtonNo');
+    confirmButtonNo.className = 'cy-button cy-modal-confirm-button-no';
+    confirmButtonNo.appendChild(document.createTextNode(TextNo));
+    confirmButtonNo.addEventListener('click', function () {
+        // 移除本身 div
+        document.getElementById('divModalConfirm').remove();
+        // 有給定按確認後的 callback function 則執行
+        if (CallbackNo && typeof CallbackNo === 'function')
+            CallbackNo();
+    });
+
+    document.body.insertBefore(docFrag, document.body.childNodes[0]);
+    // 繪製完成就 focus 在取消按鈕上
+    document.getElementById('CyConfirmButtonNo').focus();
+}
 
 /**
  * 生成 Grid 區域
@@ -6,8 +173,10 @@
  * @param {object} GridSchema
  */
 function CyGridRender(GridID, GridSchema) {
-    if (CySchema[GridID])
+    if (CySchema[GridID]) {
         console.error('ID ' + GridID + ' 重覆使用');
+        return;
+    }
     else
         CySchema[GridID] = GridSchema;
 
@@ -216,8 +385,6 @@ function CyGridRead(GridID, Url, QueryData) {
             if (result.success) {
                 //處理表格資料繪製
                 CyGridFill(GridID, result.data);
-                //if (config.pageenable == '1')
-                console.log(schema);
                 if (schema.Page && schema.Page.Enable) {
                     if(result.data && result.data[0] && result.data[0].dataCount)
                     //處理分頁繪製
@@ -402,13 +569,9 @@ function CyGridFill(GridID, FillData) {
  */
 function CyPageFill(GridID, DataCount) {
     let config = document.getElementById(GridID + '-table').dataset;
-    console.log(config);
     let pageSize = parseInt(config.pagesize);
-    console.log(pageSize);
     let pageCount = Math.ceil(DataCount / pageSize);
-    console.log(pageCount);
     let pageNow = parseInt(config.pagenow);
-    console.log(pageNow);
     // 範圍
     let maxLength = DataCount.toString().length;
     let rangeStart = pageNow * pageSize + 1;
@@ -533,78 +696,6 @@ function CyPageButtonInit(ButtonNode, ToPage, Text, Enable) {
 
 
 /**
- * CyGrid 控制物件
- * */
-const CyGrid = {
-    /**
-     * 在指定位置繪出表格元件
-     * @param {string} GridID
-     * @param {object} GridSchema
-     */
-    Render: function (GridID, GridSchema) {
-        if (!GridID || !GridSchema) {
-            console.error('缺少 GridID 或 GridShcema');
-            return;
-        }
-        if (!document.getElementById(GridID)) {
-            console.error('需要 <div id="' + GridID + '"></div> DOM元件');
-            return;
-        }
-        CyGridRender(GridID, GridSchema);
-    },
-    /**
-     * 表格元件讀取資料
-     * @param {string} GridID
-     */
-    Read: function (GridID) {
-        let schema = CySchema[GridID];
-        if (schema.Event.Read.Url) {
-            if (schema.Event.Read.QueryData) {
-                CyGridRead(GridID, schema.Event.Read.Url, schema.Event.Read.QueryData());
-            }
-            else {
-                CyGridRead(GridID, schema.Event.Read.Url, null);
-            }
-        }
-    },
-    /**
-     * 取得表格元件所選取的列編號
-     * @param {string} GridID
-     */
-    Selected: function (GridID) {
-        return document.getElementById(GridID + '-table').dataset.selected;
-    },
-    /**
-     * 跳至表格元件的指定分頁
-     * @param {string} GridID
-     * @param {number} ToPage
-     */
-    PageJump: function (GridID, ToPage) {
-        console.log(GridID, ToPage);
-        document.getElementById(GridID + '-table').dataset.pagenow = ToPage;
-        this.Read(GridID);
-    },
-    /**
-     * 取得表格元件該主鍵的資料
-     * @param {string} GridID
-     * @param {string} PrimaryKey
-     */
-    GetRowData: function (GridID, PrimaryKey) {
-        let rows = document.getElementById(GridID + '-tbody').children;
-        let primarykey = document.getElementById(GridID + '-table').dataset.primarykey.toLowerCase();
-        for (let i = 0; i < rows.length; i++) {
-            if (rows[i].dataset[primarykey] == PrimaryKey) {
-                let data = rows[i].dataset.data;
-                return JSON.parse(data);
-            }
-        }
-        return null;
-    }
-}
-
-
-
-/**
  * 讀取晝面初始化
  * */
 function CyLoadingInit() {
@@ -721,6 +812,117 @@ const CyLoading = {
         document.getElementById('loadingForeground').style.display = 'none';
         document.getElementById('loadingSVG').removeAttribute('data-active');
     }
-}
+};
 
+
+/**
+ * CyGrid 控制物件
+ * */
+const CyGrid = {
+    /**
+     * 在指定位置繪出表格元件
+     * @param {string} GridID
+     * @param {object} GridSchema
+     */
+    Render: function (GridID, GridSchema) {
+        if (!GridID || !GridSchema) {
+            console.error('缺少 GridID 或 GridShcema');
+            return;
+        }
+        if (!document.getElementById(GridID)) {
+            console.error('需要 <div id="' + GridID + '"></div> DOM元件');
+            return;
+        }
+        CyGridRender(GridID, GridSchema);
+    },
+    /**
+     * 表格元件讀取資料
+     * @param {string} GridID
+     */
+    Read: function (GridID) {
+        let schema = CySchema[GridID];
+        if (schema.Event.Read.Url) {
+            if (schema.Event.Read.QueryData) {
+                CyGridRead(GridID, schema.Event.Read.Url, schema.Event.Read.QueryData());
+            }
+            else {
+                CyGridRead(GridID, schema.Event.Read.Url, null);
+            }
+        }
+    },
+    /**
+     * 取得表格元件所選取的列編號
+     * @param {string} GridID
+     */
+    Selected: function (GridID) {
+        return document.getElementById(GridID + '-table').dataset.selected;
+    },
+    /**
+     * 跳至表格元件的指定分頁
+     * @param {string} GridID
+     * @param {number} ToPage
+     */
+    PageJump: function (GridID, ToPage) {
+        document.getElementById(GridID + '-table').dataset.pagenow = ToPage;
+        this.Read(GridID);
+    },
+    /**
+     * 取得表格元件該主鍵的資料
+     * @param {string} GridID
+     * @param {string} PrimaryKey
+     */
+    GetRowData: function (GridID, PrimaryKey) {
+        let rows = document.getElementById(GridID + '-tbody').children;
+        let primarykey = document.getElementById(GridID + '-table').dataset.primarykey.toLowerCase();
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].dataset[primarykey] == PrimaryKey) {
+                let data = rows[i].dataset.data;
+                return JSON.parse(data);
+            }
+        }
+        return null;
+    }
+};
+
+
+/**
+ * CyModal 控制物件
+ * */
+const CyModal = {
+    /**
+     * 
+     * @param {any} Message
+     * @param {string} Size
+     * @param {string} Title
+     * @param {string} Text
+     * @param {function} Callback
+     */
+    Alert: function (Message, Size, Title, Text, Callback) {
+        let wh = CyModalCheckWidthHeight(Size);
+        if (!wh) return;
+        if (!Title) Title = '訊息';
+        if (!Text) Text = '確認';
+        CyModalAlertRender(Message, wh[0], wh[1], Title, Text, Callback);
+    },
+    Confirm: function (Message, Size, Title, CallbackOk, TextOk, TextNo, CallbackNo) {
+        let wh = CyModalCheckWidthHeight(Size);
+        if (!wh) return;
+        if (!Title) Title = '訊息';
+        if (!TextOk) TextOk = '確認';
+        if (!TextNo) TextNo = '取消';
+        CyModalConfirmRender(Message, wh[0], wh[1], Title, CallbackOk, TextOk, TextNo, CallbackNo);
+    },
+    Render: function (ModalID) {
+
+    },
+    Open: function (ModalID) {
+
+    },
+    Close: function (ModalID) {
+
+    },
+    Error: function () {
+
+    }
+};
 window.addEventListener('load', CyLoadingInit);

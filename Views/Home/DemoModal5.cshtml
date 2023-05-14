@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "CyModal Confirm - 點擊確認與取消鈕後執行不同動作";
+}
+<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div>
+    <button class="cy-button btn-white"onclick="btnClick();">彈窗</button>
+</div>
+
+<h1 id="callbackText"></h1>
+
+<script>
+    function btnConfirmClick(){
+        document.getElementById('callbackText').textContent = '點擊了確認';
+    }
+    function btnConfirmCancel(){
+        document.getElementById('callbackText').textContent = '點擊了取消';
+    }
+    function btnClick() {
+        document.getElementById('callbackText').textContent = '';
+        CyModal.Confirm('依點選不同的按鈕，執行並顯示不同的訊息，而且寫法為放入函數名做為 callback', 'L', '確認與取消範例', btnConfirmClick, null, null, btnConfirmCancel);
+    }
+</script>

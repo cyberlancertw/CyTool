@@ -31,6 +31,26 @@ namespace CyTool.Controllers
             return View();
         }
 
+        public IActionResult DemoModal1()
+        {
+            return View();
+        }
+        public IActionResult DemoModal2()
+        {
+            return View();
+        }
+        public IActionResult DemoModal3()
+        {
+            return View();
+        }
+        public IActionResult DemoModal4()
+        {
+            return View();
+        }
+        public IActionResult DemoModal5()
+        {
+            return View();
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

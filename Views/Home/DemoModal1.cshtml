@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "示範使用彈窗 CyModal Alert - 基本";
+}
+<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div>
+    <label>文字：<input type="text" value="彈窗要顯示的文字" id="modalmessage" /></label>
+    <button class="cy-button btn-green" onclick="btnClick();">彈窗</button>
+</div>
+
+<script>
+    function btnClick() {
+        let message = document.getElementById('modalmessage').value;
+        CyModal.Alert(message, 'M');
+    }
+</script>

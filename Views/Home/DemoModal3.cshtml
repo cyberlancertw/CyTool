@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "示範使用彈窗 CyModal Alert - 用清單等 DOM 顯示訊息，並使用自訂大小 150*350";
+}
+<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div>
+    <button class="cy-button btn-yellow" onclick="btnClick();">彈窗</button>
+</div>
+
+<script>
+    function btnClick(){
+        let docFrag = document.createDocumentFragment();
+        let title = document.createElement('div');
+        docFrag.appendChild(title);
+        title.setAttribute('style', 'color:blue;font-weight:900;');
+        title.appendChild(document.createTextNode('藍字標題'));
+        let ul = document.createElement('ul');
+        docFrag.appendChild(ul);
+        let itemList = [ '項目甲', '項目乙', '項目丙', '項目丁' ];
+        for(let i = 0; i < itemList.length; i++){
+            let li = document.createElement('li');
+            ul.appendChild(li);
+            li.appendChild(document.createTextNode(itemList[i]));
+        }
+        CyModal.Alert(docFrag, '150*350', null, null, null);
+    }
+</script>

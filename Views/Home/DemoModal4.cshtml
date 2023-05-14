@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "示範使用彈窗 CyModal Confirm - 點擊確認鈕後才繼續動作";
+}
+<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div>
+    <label>文字：<input type="text" value="彈窗要顯示的文字，點擊確認才會執行後續動作，將訊息顯示在下方，若點擊的是取消，則直接結束" id="modalmessage" /></label>
+    <button class="cy-button btn-black" onclick="btnClick();">彈窗</button>
+</div>
+
+<h1 id="callbackText"></h1>
+
+<script>
+    function btnClick() {
+        document.getElementById('callbackText').textContent = '';
+        let message = document.getElementById('modalmessage').value;
+        CyModal.Confirm(message, 'L', '確認範例', function(){ 
+            document.getElementById('callbackText').textContent = '點擊了確認';
+        });
+    }
+</script>

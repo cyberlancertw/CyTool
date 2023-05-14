@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "示範使用彈窗 CyModal Alert - 點選確認後的動作";
+}
+<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div>
+    <button class="cy-button btn-gray" onclick="btnClick();">彈窗</button>
+</div>
+
+<h1 id="callbackText"></h1>
+
+<script>
+    function btnClick() {
+        document.getElementById('callbackText').textContent = '';
+        CyModal.Alert('使用 L Size，自訂標題，按鈕描述，並在點選繼續按鈕後，有後續動作將訊息顯示在下方', 'L', '範例', '繼續', function () {
+            document.getElementById('callbackText').textContent = '點選了繼續按鈕';
+        });
+    }
+
+</script>
