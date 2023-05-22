@@ -2,6 +2,39 @@
  * https://github.com/cyberlancertw/CyTool */
 
 var CySchema = {};
+var xmls = 'http://www.w3.org/2000/svg';
+
+
+/**
+ * 圖示 render
+ * */
+const CyIconList = {
+    'check': 'M140 375l200 250l420 -525l100 80l-520 650l-300 -375z',
+    'minus': 'M120 405l15 -15h630l15 15v90l-15 15h-630l-15 -15Z',
+    'plus': 'M165 405l15 -15h225v-225l15 -15h90l15 15v225h225l15 15v90l-15 15h-225v225l-15 15h-90l-15 -15v-225h-225l-15 -15z',
+    'zoom': 'M800 890l-225 -225v-50l-45 -45A315 315 0 1 1 570 530l45 45h50 l225 225l-90 90zM325 70A275 275 0 1 1 325 70zM326 78a245 245 0 1 0 0 500a245 245 0 1 0 0 -500z',
+    'pencil': 'M20 870v-150l500 -500l160 160l-500 500h-150z M110 715l20 20l380 -380l-20 -20z M560 180 l80 -80a35.5 35.5 0 0 1 50 0l110 110a35.5 35.5 0 0 1 0 50l-80 80z',
+    'trashcan': 'M170 200v-70a40 40 0 0 1 40 -40h150v-50a20 20 0 0 1 20 -20h140a20 20 0 0 1 20 20v50h150a40 40 0 0 1 40 40v70zM400 90h100v-30h-100zM190 240h520l-50 630h-420zM270 310l39 491.4h282l39 -491.4h-50.9l-34.1 430h-70v-430h-50v430h-70l-34.1 -430z',
+    'gear': '',
+    'undo': 'M383.2 110l-300 300a56.5 56.5 0 0 0 0 80l300 300v-250a487.5 487.5 0 0 1 450 300a450.9 450.9 0 0 0 -450 -480z',
+    'redo': 'M516.8 110l300 300a56.5 56.5 0 0 1 0 80l-300 300v-250a487.5 487.5 0 0 0 -450 300a450.9 450.9 0 0 1 450 -480z',
+    'arrow-w': 'M701.1 160l-433 250a46.1 46.1 0 0 0 0 80l433 250z',
+    'arrow-e': 'M198.9 160l433 250a46.1 46.1 0 0 1 0 80l-433 250z',
+    'arrow-n': 'M740 701.1l-250 -433a46.1 46.1 0 0 0 -80 0 l-250 433z',
+    'arrow-s': 'M740 198.9l-250 433a46.1 46.1 0 0 1 -80 0 l-250 -433z',
+    'arrow-w-end': 'M770 160l-433 250a46.1 46.1 0 0 0 0 80l433 250zM130 160v580h120v-580z',
+    'arrow-e-end': 'M130 160l433 250a46.1 46.1 0 0 1 0 80l-433 250zM770 160v580h-120v-580z',
+    'arrow-n-end': 'M740 770l-250 -433a46.1 46.1 0 0 0 -80 0 l-250 433zM740 130h-580v120h580z',
+    'arrow-s-end': 'M740 130l-250 433a46.1 46.1 0 0 1 -80 0 l-250 -433zM740 770h-580v-120h580z',
+    'arrow-w-b': 'M773.3 50l-623.5 360a46.1 46.1 0 0 0 0 80l623.5 360z',
+    'arrow-e-b': 'M126.7 50l623.5 360a46.1 46.1 0 0 1 0 80l-623.5 360z',
+    'arrow-n-b': 'M50 773.3l360 -623.5 a46.1 46.1 0 0 1 80 0l360 623.5z',
+    'arrow-s-b': 'M50 126.7l360 623.5 a46.1 46.1 0 0 0 80 0l360 -623.5z',
+    'arrow-w-end-b': 'M860 50l-623.5 360a46.1 46.1 0 0 0 0 80l623.5 360zM30 50v800h150v-800z',
+    'arrow-e-end-b': 'M40 50l623.5 360a46.1 46.1 0 0 1 0 80l-623.5 360zM870 50v800h-150v-800z',
+    'arrow-n-end-b': 'M50 860l360 -623.5 a46.1 46.1 0 0 1 80 0l360 623.5z M50 30h800v150h-800z',
+    'arrow-s-end-b': 'M50 40l360 623.5 a46.1 46.1 0 0 0 80 0l360 -623.5z M50 860h800v-150h-800z',
+};
 
 /**
  * 分析 CyModal 傳入 Size 取得要繪製的彈窗寬與高
@@ -370,6 +403,8 @@ function CyGridRender(GridID, GridSchema) {
  */
 function CyGridRead(GridID, Url, QueryData) {
 
+    if (QueryData == null)
+        var QueryData = {};
     QueryData['Config'] = QueryCyGridConfig(GridID);
     CyLoading.Start();
 
@@ -386,16 +421,16 @@ function CyGridRead(GridID, Url, QueryData) {
                 //處理表格資料繪製
                 CyGridFill(GridID, result.data);
                 if (schema.Page && schema.Page.Enable) {
-                    if(result.data && result.data[0] && result.data[0].dataCount)
+                    if(result.data && result.data[0] && result.data[0].datacount)
                     //處理分頁繪製
-                    CyPageFill(GridID, parseInt(result.data[0].dataCount));
+                    CyPageFill(GridID, parseInt(result.data[0].datacount));
                 }
                 if (schema && schema.Event && schema.Event.ReadDone) {
                     schema.Event.ReadDone(result.data);
                 }
             }
             else {
-                alert('!?');// alert
+                CyModal.Alert(result.message, 'L');
             }
         })
         .then(function () {
@@ -520,8 +555,8 @@ function CyGridFill(GridID, FillData) {
                         // 設定選到的主鍵
                         config.selected = '';
                         // 取消選取的自訂 callback
-                        if (schema && schema.Event && schema.Event.RowSelect) {
-                            schema.Event.RowSelect(item, FillData);
+                        if (schema && schema.Event && schema.Event.RowDeselect) {
+                            schema.Event.RowDeselect(item, FillData);
                         }
                     }
                     else {
@@ -568,6 +603,7 @@ function CyGridFill(GridID, FillData) {
  * @param {number} DataCount
  */
 function CyPageFill(GridID, DataCount) {
+    let schema = CySchema[GridID];
     let config = document.getElementById(GridID + '-table').dataset;
     let pageSize = parseInt(config.pagesize);
     let pageCount = Math.ceil(DataCount / pageSize);
@@ -649,6 +685,10 @@ function CyPageFill(GridID, DataCount) {
     }
     jump.appendChild(docFragJump);
     jump.value = pageNow;
+
+    // 有讀取結束的事件則執行
+    if (schema.Event && schema.Event.PageReadDone)
+        schema.Event.PageReadDone();
 }
 
 /**
@@ -710,7 +750,7 @@ function CyLoadingInit() {
         CyLoadingInit();
         return;
     }
-    let xmls = 'http://www.w3.org/2000/svg';
+    
     let w = Math.min(window.outerWidth * 0.1, window.outerHeight * 0.1);
     if (w < 25) w = 25;
     let r1 = w * 0.05, r2 = w * 0.35, r3 = w * 0.45;
@@ -925,4 +965,40 @@ const CyModal = {
 
     }
 };
+
+/**
+ * CyIcon 控制物件
+ * */
+const CyIcon = {
+    Render: function () {
+        let renderObj = document.querySelectorAll('i[data-size]');
+        for (let i = 0, n = renderObj.length; i < n; i++) {
+            let dom = renderObj[i];
+            let iconName = dom.textContent;
+            if (!CyIconList[iconName]) {
+                console.error('CyIcon 缺少圖示名稱 ' + iconName);
+                continue;
+            }
+            let s = dom.dataset.size;
+            if (isNaN(s)) {
+                console.error('CyIcon 的 data-size 內必須為數字表示多少 rem');
+                continue;
+            }
+            let docFrag = document.createDocumentFragment();
+            let svg = document.createElementNS(xmls, 'svg');
+            docFrag.appendChild(svg);
+            svg.setAttribute('viewBox', '0 0 900 900');
+            svg.setAttribute('style', 'width:' + s + 'rem;height:' + s + 'rem;');
+            let path = document.createElementNS(xmls, 'path');
+            svg.appendChild(path);
+            path.setAttribute('d', CyIconList[iconName]);
+            path.setAttribute('fill', 'currentColor');
+            dom.parentNode.insertBefore(docFrag, dom);
+            dom.remove();
+        }
+    }
+};
+
+
 window.addEventListener('load', CyLoadingInit);
+window.addEventListener('load', CyIcon.Render);

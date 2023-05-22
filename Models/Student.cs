@@ -9,6 +9,6 @@
         public double Height { get; set; }
         public double Weight { get; set; }
         public int Score { get; set; }
-        public int DataCount { get; set; }
+        public int datacount { get; set; }
     }
 }

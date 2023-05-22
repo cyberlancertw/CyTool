@@ -51,6 +51,10 @@ namespace CyTool.Controllers
         {
             return View();
         }
+        public IActionResult DemoIcon()
+        {
+            return View();
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

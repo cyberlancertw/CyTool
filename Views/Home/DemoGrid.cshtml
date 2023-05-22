@@ -10,9 +10,7 @@
 <div id="GridDemo"></div>
 
 <script>
-    function foo(item, data){
-        console.log(foo);
-    }
+    var app = '/@Context.Request.PathBase';
 
     const gridDemoSchema = {
         PrimaryKey: 'id',
@@ -103,16 +101,17 @@
         },
         Event: {
             Read: {
-                Url: '/Home/QueryStudents',
+                Url: app + 'Home/QueryStudents',
                 QueryData: ReadStudents
             },
             RowSelect: function(item, datas){ 
                 console.log(item);
                 console.log(datas);
             },
-            //"RowDeselect": "RowDeselectTest(item.name);",
-            //"RowDoubleClick": "ContinueGameDb(item.characterID);",
-            //"ReadDone": "ReadDoneTest();"
+            //RowDeselect: function(item, datas) { },
+            //RowDoubleClick: function(item, datas) { },
+            //ReadDone: function(datas) { },
+            PageReadDone: function() { }
         },
         MultiSelect: false
     }

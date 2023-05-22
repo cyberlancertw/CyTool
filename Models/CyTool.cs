@@ -8,9 +8,9 @@ namespace CyTool.Models
         {
             if (!config.PageEnable || config.PageSize == 0) return sql;
 
-            sql = "WITH TempCyGridQuery AS(" + sql + ")SELECT COUNT(1) OVER() AS DataCount, TempCyGridQuery.* FROM TempCyGridQuery ORDER BY ";
+            sql = "WITH TempCyGridQuery AS(" + sql + ")SELECT COUNT(1) OVER() AS datacount, TempCyGridQuery.* FROM TempCyGridQuery ORDER BY ";
             if (string.IsNullOrEmpty(config.SortType))
-                sql += "CyGridDataCount";
+                sql += "datacount";
             else
                 sql += config.SortType + (config.SortDesc ? " DESC" : "");
 
