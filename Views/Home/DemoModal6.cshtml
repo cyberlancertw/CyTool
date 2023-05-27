@@ -1,45 +1,61 @@
 ﻿@{
-    ViewData["Title"] = "示範 CyModal";
+    ViewData["Title"] = "示範 CyModal 渲染與開關";
 }
 <link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
 <script src="~/js/CyTool.js" asp-append-version="true"></script>
 
 <div>
-    <label>文字：<input type="text" value="彈窗要顯示的文字" id="modalmessage" /></label>
-    <button onclick="btnClick1();">彈窗</button>
-</div>
-<div>
-    <button onclick="btnClick2();">放入 li 清單</button>
+    <button class="cy-button btn-orange" onclick="btnClick();">彈窗</button>
 </div>
 
+<input type="text" value="新標題" placeholder="請輸入新標題" id="newTitle" />
 <div>
-    <button onclick="btnClick3();">確認視窗</button>
+    <button class="cy-button btn-blue" onclick="btnClick2();">修改標題</button>
 </div>
-
 <h1 id="callbackText"></h1>
 
 <script>
-    function btnClick1() {
-        let message = document.getElementById('modalmessage').value;
-        CyModal.Alert(message, 'L', '範例', '範例', null);
+    window.addEventListener('load', function(){
+        // DOM 的生成
+        let docFrag = document.createDocumentFragment();
+        let label = document.createElement('label');
+        docFrag.appendChild(label);
+        label.appendChild(document.createTextNode('描述：'));
+        label.setAttribute('for', 'txtbox');
+        docFrag.appendChild(document.createElement('br'));
+        let textbox = document.createElement('input');
+        docFrag.appendChild(textbox);
+        textbox.setAttribute('id', 'txtbox');
+        textbox.setAttribute('placeholder', '請輸入文字');
+        docFrag.appendChild(document.createElement('br'));
+        let btn = document.createElement('button');
+        docFrag.appendChild(btn);
+        btn.className = 'cy-button btn-blue';
+        btn.appendChild(document.createTextNode('送出'));
+        btn.addEventListener('click', function(){
+            document.getElementById('callbackText').textContent = document.getElementById('txtbox').value;
+            // 指定 ModalID 來關閉
+            CyModal.Close('modal6');
+        });
+        docFrag.appendChild(document.createElement('br'));
+        let span = document.createElement('span');
+        docFrag.appendChild(span);
+        span.textContent = '按下送出才會顯示輸入的文字，若是按右上角的叉叉則只有直接關閉彈窗。';
+
+        // 傳入 DocumentFragment 
+        CyModal.Render('modal6', docFrag, 'L', '彈窗範例');
+    });
+
+    function btnClick() {
+        document.getElementById('txtbox').value = '';
+        document.getElementById('callbackText').textContent = '';
+        // 指定 ModalID 來開啟
+        CyModal.Open('modal6');
     }
 
     function btnClick2(){
-        let docFrag = document.createDocumentFragment();
-        let ul = document.createElement('ul');
-        docFrag.appendChild(ul);
-        let itemList = [ '項目甲', '項目乙', '項目丙', '項目丁' ];
-        for(let i = 0; i < itemList.length; i++){
-            let li = document.createElement('li');
-            ul.appendChild(li);
-            li.appendChild(document.createTextNode(itemList[i]));
-        }
-        CyModal.Alert(docFrag, 'M', null, null, null);
+        let title = document.getElementById('newTitle').value;
+        CyModal.SetTitle('modal6', title);
     }
-    function btnClick3() {
-        let message = document.getElementById('modalmessage').value;
-        CyModal.Confirm(message, 'L', '確認範例', function(){ 
-            document.getElementById('callbackText').textContent = '點擊了確認';
-        });
-    }
+
 </script>

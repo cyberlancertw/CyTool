@@ -51,6 +51,14 @@ namespace CyTool.Controllers
         {
             return View();
         }
+        public IActionResult DemoModal6()
+        {
+            return View();
+        }
+        public IActionResult DemoModal7()
+        {
+            return View();
+        }
         public IActionResult DemoIcon()
         {
             return View();

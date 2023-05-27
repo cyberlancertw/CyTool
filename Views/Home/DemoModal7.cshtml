@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "示範 CyModal";
+}
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<!--先寫好 HTML 以 id="getContent 放著，也可以外面再包一個 style="display:none" 的 div 保證看不到 -->
+<div id="getContent">
+    <label for="txtbox">描述：</label><br />
+    <input id="txtbox" placeholder="請輸入文字" /><br />
+    <button class="cy-button btn-blue" onclick="btnSend();">送出</button><br />
+    <span>按下送出才會顯示輸入的文字，若是按右上角的叉叉則只有直接關閉彈窗。</span>
+</div>
+
+<div>
+    <button class="cy-button btn-green" onclick="btnClick();">彈窗</button>
+</div>
+
+<h1 id="callbackText"></h1>
+
+<script>
+
+    window.addEventListener('load', function(){
+        // 傳入 id 'getContent' 將寫好的 HTML 取出來塞入，而原來的會移除
+        CyModal.Render('modal7', 'getContent', 'L', '彈窗範例');
+    });
+
+    function btnClick() {
+        document.getElementById('txtbox').value = '';
+        document.getElementById('callbackText').textContent = '';
+        // 指定 ModalID 來開啟
+        CyModal.Open('modal7');
+    }
+
+    function btnSend(){
+        document.getElementById('callbackText').textContent = document.getElementById('txtbox').value;
+        // 指定 ModalID 來關閉
+        CyModal.Close('modal7');
+    }
+</script>

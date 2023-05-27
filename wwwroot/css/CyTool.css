@@ -328,6 +328,35 @@
     border-left-color: #1b759f;
 }
 
+/* 彈窗隱藏*/
+.cy-modal-close{
+    display: none;
+}
+
+/* 彈窗開啟*/
+.cy-modal-open{
+    display: block;
+}
+
+/* 彈窗標題列 */
+.cy-modal-title{
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 彈窗關閉按鈕 */
+.cy-modal-close-button{
+    border:none;
+    background-color: white;
+    color: #c0c0c0;
+    cursor: pointer;
+}
+
+/* 彈窗關閉按鈕懸停 */
+.cy-modal-close-button:hover{
+    color: #000000;
+}
+
 /* 圖示預設隱藏 */
 i[data-size]{
     display:none;
@@ -607,24 +636,58 @@ i[data-size]{
 
 /* 橘色按鈕懸停 */ 
 .btn-orange:hover {
-    background-color: #996ca3;
-    border-color: #996ca3;
+    background-color: #c99b32;
+    border-color: #c99b32;
 }
 
 /* 橘色按鈕點擊 */ 
 .btn-orange:active {
-    background-color: #996ca3;
-    border-top-color: #794c83;
-    border-right-color: #b98cc3;
-    border-bottom-color: #b98cc3;
-    border-left-color: #794c83;
+    background-color: #c99b32;
+    border-top-color: #a97b12;
+    border-right-color: #e9bb52;
+    border-bottom-color: #e9bb52;
+    border-left-color: #a97b12;
 }
 
 /* 橘色按鈕取消 */ 
 .btn-orange:disabled {
-    background-color: #b98cc3;
-    border-top-color: #d9a8e3;
-    border-right-color: #996ca3;
-    border-bottom-color: #996ca3;
-    border-left-color: #d9a8e3;
+    background-color: #e9bb52;
+    border-top-color: #ffdb72;
+    border-right-color: #c99b32;
+    border-bottom-color: #c99b32;
+    border-left-color: #ffdb72;
+}
+
+/* 櫻色按鈕 */
+.btn-sakura {
+    color: #000000;
+    background-color: #fedfe1;
+    border-top-color: #ffffff;
+    border-right-color: #debfc1;
+    border-bottom-color: #debfc1;
+    border-left-color: #ffffff;
+}
+
+/* 櫻色按鈕懸停 */ 
+.btn-sakura:hover {
+    background-color: #debfc1;
+    border-color: #debfc1;
+}
+
+/* 櫻色按鈕點擊 */ 
+.btn-sakura:active {
+    background-color: #debfc1;
+    border-top-color: #be9fa1;
+    border-right-color: #fedfe1;
+    border-bottom-color: #fedfe1;
+    border-left-color: #be9fa1;
+}
+
+/* 櫻色按鈕取消 */ 
+.btn-sakura:disabled {
+    background-color: #fedfe1;
+    border-top-color: #ffffff;
+    border-right-color: #debfc1;
+    border-bottom-color: #debfc1;
+    border-left-color: #ffffff;
 }

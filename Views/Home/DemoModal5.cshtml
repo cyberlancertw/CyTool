@@ -11,6 +11,10 @@
 
 <h1 id="callbackText"></h1>
 
+<div>
+    <button class="cy-button btn-orange" onclick="btnClick2();">彈窗2</button>
+</div>
+
 <script>
     function btnConfirmClick(){
         document.getElementById('callbackText').textContent = '點擊了確認';
@@ -20,6 +24,14 @@
     }
     function btnClick() {
         document.getElementById('callbackText').textContent = '';
-        CyModal.Confirm('依點選不同的按鈕，執行並顯示不同的訊息，而且寫法為放入函數名做為 callback', 'L', '確認與取消範例', btnConfirmClick, null, null, btnConfirmCancel);
+        CyModal.Confirm('依點選不同的按鈕，執行並顯示不同的訊息，而且寫法為放入函數名做為 callback', 'L', '確認與取消範例', null, null, btnConfirmClick, btnConfirmCancel);
+    }
+
+    function btnClick2(){
+        document.getElementById('callbackText').textContent = '';
+        CyModal.Confirm('依點選不同的按鈕，執行並顯示不同的訊息，並使用 then 處理後續動作', 'L', '確認與取消範例').then(function(confirmed){
+            if(confirmed) btnConfirmClick();
+            else btnConfirmCancel();
+        });
     }
 </script>

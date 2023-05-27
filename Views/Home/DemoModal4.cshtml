@@ -12,12 +12,26 @@
 
 <h1 id="callbackText"></h1>
 
+<div>
+    <button class="cy-button btn-blue" onclick="btnClick2();">彈窗2</button>
+</div>
 <script>
     function btnClick() {
         document.getElementById('callbackText').textContent = '';
         let message = document.getElementById('modalmessage').value;
-        CyModal.Confirm(message, 'L', '確認範例', function(){ 
+        CyModal.Confirm(message, 'L', '確認範例', null, null, function(){ 
             document.getElementById('callbackText').textContent = '點擊了確認';
         });
+    }
+
+    function btnClick2(){
+        document.getElementById('callbackText').textContent = '';
+        let message = document.getElementById('modalmessage').value;
+        CyModal.Confirm(message, 'L', '確認範例').then(function(confirmed){
+            if(confirmed){
+                document.getElementById('callbackText').textContent = '點擊了彈窗2的確認';
+            }
+        });
+
     }
 </script>

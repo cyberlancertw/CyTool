@@ -11,11 +11,21 @@
 
 <h1 id="callbackText"></h1>
 
+<div>
+    <button class="cy-button btn-yellow" onclick="btnClick2();">彈窗2</button>
+</div>
 <script>
     function btnClick() {
         document.getElementById('callbackText').textContent = '';
         CyModal.Alert('使用 L Size，自訂標題，按鈕描述，並在點選繼續按鈕後，有後續動作將訊息顯示在下方', 'L', '範例', '繼續', function () {
             document.getElementById('callbackText').textContent = '點選了繼續按鈕';
+        });
+    }
+
+    function btnClick2(){
+        document.getElementById('callbackText').textContent = '';
+        CyModal.Alert('使用 then 來處理後續動作', 'M', '範例', '繼續').then(function(){
+            document.getElementById('callbackText').textContent = '點選了彈窗2的繼續按鈕';
         });
     }
 
