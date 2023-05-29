@@ -41,6 +41,21 @@
     border-bottom-width: 1px;
 }
 
+/* 表格資料中的偶數列 */
+.grid-tbody>tr:nth-child(2n){
+    background-color: azure;
+}
+
+/* 表格資料中的偶數列被選取時 */
+.grid-tbody>tr:nth-child(2n).row-selected{
+    background-color: #fedfe1;
+}
+
+/* 表格資料中的偶數列懸停時 */
+.grid-tbody>tr:nth-child(2n):hover{
+    background-color: #fedfe1;
+}
+
 /* 表格資料列中的欄 */
 .grid-tbody > tr > td {
     border-width: 0px;
@@ -59,7 +74,7 @@
 }
 
 /* 被選取列的懸停樣式 */
-.row-selected:hover {
+.grid-row.row-selected:hover, .grid-tbody > tr:nth-child(2n).grid-row.row-selected:hover {
     background-color: #debfc1;
 }
 
@@ -165,8 +180,8 @@
 .cy-modal-alert{
     
 }
-/* 彈窗背景*/
-.cy-modal-background {
+/* 彈窗 alert confirm 背景*/
+.cy-alert-background, .cy-confirm-background {
     left: 0;
     top: 0;
     width: 100%;
@@ -176,8 +191,8 @@
     opacity: .75;
     z-index: 99996;
 }
-/* 彈窗前景*/
-.cy-modal-foreground {
+/* 彈窗 alert confirm 前景*/
+.cy-alert-foreground, cy-confirm-foreground {
     left: 50%;
     top: 50%;
     position: absolute;
@@ -328,6 +343,32 @@
     border-left-color: #1b759f;
 }
 
+
+/* 彈窗背景*/
+.cy-modal-background {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #606060;
+    position: absolute;
+    opacity: .75;
+    z-index: 99994;
+}
+
+/* 彈窗前景*/
+.cy-modal-foreground {
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    z-index: 99995;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px #404040 ;
+    transform: translate(-50%,-50%);
+    animation-name: modalPop;
+    animation-duration: 0.3s;
+}
 /* 彈窗隱藏*/
 .cy-modal-close{
     display: none;

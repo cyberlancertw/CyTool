@@ -92,10 +92,10 @@ function CyModalAlertRender(Message, Width, Height, Title, Text, Callback) {
     divModalAlert.setAttribute('id', 'divModalAlert');
     let cyModalBg = document.createElement('div');
     divModalAlert.appendChild(cyModalBg);
-    cyModalBg.className = 'cy-modal-background';
+    cyModalBg.className = 'cy-alert-background';
     let alertFg = document.createElement('div');
     divModalAlert.appendChild(alertFg);
-    alertFg.className = 'cy-modal-foreground';
+    alertFg.className = 'cy-alert-foreground';
     alertFg.setAttribute('style', 'width:' + Width + 'px;height:' + Height + 'px;');
 
     let alertContent = document.createElement('div');
@@ -159,10 +159,10 @@ function CyModalConfirmRender(Message, Width, Height, Title, TextOk, TextNo, Cal
     divModalConfirm.setAttribute('id', 'divModalConfirm');
     let cyModalBg = document.createElement('div');
     divModalConfirm.appendChild(cyModalBg);
-    cyModalBg.className = 'cy-modal-background';
+    cyModalBg.className = 'cy-confirm-background';
     let confirmFg = document.createElement('div');
     divModalConfirm.appendChild(confirmFg);
-    confirmFg.className = 'cy-modal-foreground';
+    confirmFg.className = 'cy-confirm-foreground';
     confirmFg.setAttribute('style', 'width:' + Width + 'px;height:' + Height + 'px;');
 
     let confirmContent = document.createElement('div');
@@ -299,6 +299,7 @@ function CyModalRender(ModalID, Content, Width, Height, Title) {
         }
     }
     document.getElementById(ModalID).appendChild(docFrag);
+    CyIcon.Render();
     return;
 }
 
