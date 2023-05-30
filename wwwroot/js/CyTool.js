@@ -40,6 +40,248 @@ const CyIconList = {
     'file-excel': 'M560 60l200 200v440a60 60 0 0 1 -60 60h-80v30a60 60 0 0 1 -60 60h-360a60 60 0 0 1 -60 -60v-580a60 60 0 0 1 60 -60h80v-30a60 60 0 0 1 60 -60zM560 144.8v116.2h116.2zM500 120h-160v580h360v-380h-200zM280 210h-80v580h360v-30h-220a60 60 0 0 1 -60 -60zM640 380v260h-240v-260zM600 420h-60v70h60zM600 530h-60v70h60zM500 420h-60v180h60zM560 60l200 200v440a60 60 0 0 1 -60 60h-80v30a60 60 0 0 1 -60 60h-360a60 60 0 0 1 -60 -60v-580a60 60 0 0 1 60 -60h80v-30a60 60 0 0 1 60 -60zM560 144.8v116.2h116.2zM500 120h-160v580h360v-380h-200zM280 210h-80v580h360v-30h-220a60 60 0 0 1 -60 -60zM640 380v260h-240v-260zM600 420h-160v70h160zM600 530h-60v70h60zM500 530h-60v70h60z',
 };
 
+function CyTransferRender(TransferSchema) {
+    let TransferID = TransferSchema.TransferID;
+    if (CySchema[TransferID]) {
+        console.error('ID ' + TransferID + ' 重覆使用');
+        return;
+    }
+    else
+        CySchema[TransferID] = TransferSchema;
+
+    let docFrag = document.createDocumentFragment();
+    let divWrap = document.createElement('div');
+    docFrag.appendChild(divWrap);
+    divWrap.className = 'cy-transfer-wrap';
+    if (TransferSchema.Height) divWrap.setAttribute('style', 'height:' + TransferSchema.Height + 'px;');
+    let fromWrap = document.createElement('div');
+    let toWrap = document.createElement('div');
+    let divFrom = document.createElement('div');
+    let divBtn = document.createElement('div');
+    let divTo = document.createElement('div');
+
+    if (TransferSchema.Label) {
+        let labelFrom = document.createElement('div')
+        fromWrap.appendChild(labelFrom);
+        labelFrom.className = 'cy-transfer-label-from';
+        labelFrom.appendChild(document.createTextNode(TransferSchema.Label.From));
+        let labelTo = document.createElement('div')
+        toWrap.appendChild(labelTo);
+        labelTo.className = 'cy-transfer-label-to';
+        labelTo.appendChild(document.createTextNode(TransferSchema.Label.To));
+        if (TransferSchema.Filter) {
+            labelFrom.setAttribute('style', 'display:inline-block;width:60%;');
+            labelTo.setAttribute('style', 'display:inline-block;width:60%;');
+        }
+    }
+
+    if (TransferSchema.Filter) {
+        let filterFrom = document.createElement('div');
+        fromWrap.appendChild(filterFrom);
+        filterFrom.className = 'cy-transfer-filter';
+        let ipt = document.createElement('input');
+        filterFrom.appendChild(ipt);
+        ipt.setAttribute('type', 'text');
+        ipt.setAttribute('id', TransferID + '-filter-from');
+        ipt.setAttribute('placeholder', '查詢...');
+        ipt.addEventListener('keyup', function () {
+            let keyword = document.getElementById(TransferID + '-filter-from').value;
+            let items = divFrom.querySelectorAll('.cy-transfer-item');
+            for (let i = 0, n = items.length; i < n; i++) {
+                if (items[i].getAttribute('data-text').toLowerCase().indexOf(keyword.toLowerCase()) > -1)
+                    items[i].classList.remove('hidden');
+                else
+                    items[i].classList.add('hidden');
+            }
+        });
+        let filterTo = document.createElement('div');
+        toWrap.appendChild(filterTo);
+        filterTo.className = 'cy-transfer-filter';
+        ipt = document.createElement('input');
+        filterTo.appendChild(ipt);
+        ipt.setAttribute('type', 'text');
+        ipt.setAttribute('id', TransferID + '-filter-to');
+        ipt.setAttribute('placeholder', '查詢...');
+        ipt.addEventListener('keyup', function () {
+            let keyword = document.getElementById(TransferID + '-filter-to').value;
+            let items = divTo.querySelectorAll('.cy-transfer-item');
+            for (let i = 0, n = items.length; i < n; i++) {
+                if (items[i].getAttribute('data-text').toLowerCase().indexOf(keyword.toLowerCase()) > -1)
+                    items[i].classList.remove('hidden');
+                else
+                    items[i].classList.add('hidden');
+            }
+        });
+        if (TransferSchema.Label) {
+            filterFrom.setAttribute('style', 'display:inline-block;width:30%;');
+            filterTo.setAttribute('style', 'display:inline-block;width:30%;');
+        }
+    }
+    divWrap.appendChild(fromWrap);
+    fromWrap.className = 'cy-transfer-from-wrap';
+    fromWrap.appendChild(divFrom);
+    divWrap.appendChild(divBtn);
+    divWrap.appendChild(toWrap);
+    toWrap.className = 'cy-transfer-to-wrap';
+    toWrap.appendChild(divTo);
+    divFrom.className = 'cy-transfer-from';
+    divBtn.className = 'cy-transfer-button';
+    divTo.className = 'cy-transfer-to';
+    if (TransferSchema.Width && TransferSchema.Width.length == 3) {
+        let width = TransferSchema.Width;
+        if (!isNaN(width[0]) && !isNaN(width[1]) && !isNaN(width[2])) {
+            fromWrap.setAttribute('style', 'width:' + width[0] + 'px;');
+            divBtn.setAttribute('style', 'width:' + width[1] + 'px;');
+            toWrap.setAttribute('style', 'width:' + width[2] + 'px;');
+        }
+        else if (width[0].indexOf('%') > -1 && width[1].indexOf('%') > -1 && width[2].indexOf('%') > -1) {
+            fromWrap.setAttribute('style', 'width:' + width[0] + ';');
+            divBtn.setAttribute('style', 'width:' + width[1] + ';');
+            toWrap.setAttribute('style', 'width:' + width[2] + ';');
+        }
+    }
+
+    let btnWrap = document.createElement('div');
+    divBtn.appendChild(btnWrap);
+    btnWrap.className = 'cy-transfer-button-wrap';
+    if (TransferSchema.Button) {
+        if (TransferSchema.Button.GoAll) btnWrap.appendChild(CyTransferCreateButton(TransferID, 'M47 160l433 250a46.1 46.1 0 0 1 0 80l-433 250zM397 160l433 250a46.1 46.1 0 0 1 0 80l-433 250v-130l114.2 -65.9a108.6 108.6 0 0 0 0 -188.2l-114.2 -65.9z', true, true));
+        if (TransferSchema.Button.Go) btnWrap.appendChild(CyTransferCreateButton(TransferID, 'M198.9 160l433 250a46.1 46.1 0 0 1 0 80l-433 250z', true, false));
+        if (TransferSchema.Button.Back) btnWrap.appendChild(CyTransferCreateButton(TransferID, 'M701.1 160l-433 250a46.1 46.1 0 0 0 0 80l433 250z', false, false));
+        if (TransferSchema.Button.BackAll) btnWrap.appendChild(CyTransferCreateButton(TransferID, 'M853 160l-433 250a46.1 46.1 0 0 0 0 80l433 250zM503 160l-433 250a46.1 46.1 0 0 0 0 80l433 250v-130l-114.2-65.9a108.6 108.6 0 0 1 0 -188.2l114.2 -65.9z', false, true));
+    }
+
+
+    let domTransfer = document.getElementById(TransferID);
+    while (domTransfer.firstChild) {
+        domTransfer.removeChild(domTransfer.firstChild);
+    }
+    domTransfer.appendChild(docFrag);
+}
+
+function CyTransferFill(TransferID, FromData, ToData) {
+    let domTransfer = document.getElementById(TransferID);
+    if (!domTransfer) {
+        console.error('缺少<div id="' + TransferID + '"></div> DOM 物件');
+        return;
+    }
+    let domFrom = domTransfer.querySelector('.cy-transfer-from');
+    let domTo = domTransfer.querySelector('.cy-transfer-to');
+    let docFrag = document.createDocumentFragment();
+    for (let i = 0, n = FromData.length; i < n; i++) {
+        let item = FromData[i];
+        if (!item.Uid) item.Uid = CyTool.UUID();
+        let divItem = document.createElement('div');
+        docFrag.appendChild(divItem);
+        divItem.setAttribute('data-text', item.Text);
+        divItem.setAttribute('data-value', item.Value);
+        divItem.setAttribute('data-uid', item.Uid);
+        divItem.className = 'cy-transfer-item';
+        divItem.appendChild(document.createTextNode(item.Text));
+        divItem.addEventListener('click', function () {
+            if (divItem.classList.contains('selected')) {
+                divItem.classList.remove('selected');
+            }
+            else {
+                divItem.classList.add('selected');
+            }
+        });
+    }
+    while (domFrom.firstChild) {
+        domFrom.removeChild(domFrom.firstChild);
+    }
+    domFrom.appendChild(docFrag);
+
+    docFrag = document.createDocumentFragment();
+    for (let i = 0, n = ToData.length; i < n; i++) {
+        let item = ToData[i];
+        if (!item.Uid) item.Uid = CyTool.UUID();
+        let divItem = document.createElement('div');
+        docFrag.appendChild(divItem);
+        divItem.setAttribute('data-text', item.Text);
+        divItem.setAttribute('data-value', item.Value);
+        divItem.setAttribute('data-uid', item.Uid);
+        divItem.className = 'cy-transfer-item';
+        divItem.appendChild(document.createTextNode(item.Text));
+        divItem.addEventListener('click', function () {
+            if (divItem.classList.contains('selected')) {
+                divItem.classList.remove('selected');
+            }
+            else {
+                divItem.classList.add('selected');
+            }
+        });
+    }
+    while (domTo.firstChild) {
+        domTo.removeChild(domTo.firstChild);
+    }
+    domTo.appendChild(docFrag);
+
+}
+
+function CyTransferCreateButton(TransferID, d, IsGo, IsAll) {
+    let btn = document.createElement('button');
+    btn.className = 'cy-button btn-yellow';
+    let icon = document.createElementNS(xmls, 'svg');
+    btn.appendChild(icon);
+    icon.setAttribute('viewBox', '0 0 900 900');
+    icon.setAttribute('style', 'width:1.2rem;height:1.2rem;');
+    let path = document.createElementNS(xmls, 'path');
+    icon.appendChild(path);
+    path.setAttribute('d', d);
+    if(IsGo)
+        btn.addEventListener('click', function () {
+            CyTransferButtonGo(TransferID, IsAll);
+        });
+    else
+        btn.addEventListener('click', function () {
+            CyTransferButtonBack(TransferID, IsAll);
+        });
+    return btn;
+}
+
+function CyTransferButtonGo(TransferID, IsAll) {
+    let divFrom = document.getElementById(TransferID).querySelector('.cy-transfer-from');
+    let divTo = document.getElementById(TransferID).querySelector('.cy-transfer-to');
+    let selector = IsAll ? '.cy-transfer-item' : '.cy-transfer-item.selected:not(.hidden)';
+    let items = divFrom.querySelectorAll(selector);
+    for (let i = 0, n = items.length; i < n; i++) {
+        items[i].classList.remove('selected');
+        items[i].classList.remove('hidden');
+        divTo.appendChild(items[i]);
+    }
+    if (IsAll && document.getElementById(TransferID + '-filter-from')) {
+        document.getElementById(TransferID + '-filter-from').value = '';
+        document.getElementById(TransferID + '-filter-to').value = '';
+    }
+
+}
+
+function CyTransferButtonBack(TransferID, IsAll) {
+    let divFrom = document.getElementById(TransferID).querySelector('.cy-transfer-from');
+    let divTo = document.getElementById(TransferID).querySelector('.cy-transfer-to');
+    let selector = IsAll ? '.cy-transfer-item' : '.cy-transfer-item.selected:not(.hidden)';
+    let items = divTo.querySelectorAll(selector);
+    for (let i = 0, n = items.length; i < n; i++) {
+        items[i].classList.remove('selected');
+        items[i].classList.remove('hidden');
+        divFrom.appendChild(items[i]);
+    }
+    if (IsAll && document.getElementById(TransferID + '-filter-from')) {
+        document.getElementById(TransferID + '-filter-from').value = '';
+        document.getElementById(TransferID + '-filter-to').value = '';
+    }
+}
+
+function CyTransferGetAllData(TransferID, RegionType, DataType) {
+    let items = document.getElementById(TransferID).querySelector('.cy-transfer-' + RegionType).querySelectorAll('.cy-transfer-item');
+    let result = [];
+    for (let i = 0, n = items.length; i < n; i++) {
+        result.push(items[i].getAttribute('data-' + DataType));
+    }
+    return result;
+}
+
 /**
  * 分析 CyModal 傳入 Size 取得要繪製的彈窗寬與高
  * @param {string} Size
@@ -305,10 +547,10 @@ function CyModalRender(ModalID, Content, Width, Height, Title) {
 
 /**
  * 生成 Grid 區域
- * @param {string} GridID
  * @param {object} GridSchema
  */
-function CyGridRender(GridID, GridSchema) {
+function CyGridRender(GridSchema) {
+    let GridID = GridSchema.GridID;
     if (CySchema[GridID]) {
         console.error('ID ' + GridID + ' 重覆使用');
         return;
@@ -971,19 +1213,18 @@ const CyLoading = {
 const CyGrid = {
     /**
      * 在指定位置繪出表格元件
-     * @param {string} GridID
      * @param {object} GridSchema
      */
-    Render: function (GridID, GridSchema) {
-        if (!GridID || !GridSchema) {
+    Render: function (GridSchema) {
+        if (!GridSchema || !GridSchema.GridID) {
             console.error('缺少 GridID 或 GridShcema');
             return;
         }
-        if (!document.getElementById(GridID)) {
-            console.error('需要 <div id="' + GridID + '"></div> DOM元件');
+        if (!document.getElementById(GridSchema.GridID)) {
+            console.error('需要 <div id="' + GridSchema.GridID + '"></div> DOM元件');
             return;
         }
-        CyGridRender(GridID, GridSchema);
+        CyGridRender(GridSchema);
     },
     /**
      * 表格元件讀取資料
@@ -1156,6 +1397,124 @@ const CyIcon = {
     }
 };
 
+const CyTool = {
+    /**
+     * 得 yyyy-MM-dd hh:mm:ss 字串
+     * @param {Date} DateTime
+     */
+    DateTimeString: function (DateTime) {
+        if (!isNaN(DateTime)) DateTime = new Date(DateTime);
+        let y = DateTime.getFullYear();
+        let M = DateTime.getMonth() > 8 ? (DateTime.getMonth() + 1) : '0' + (DateTime.getMonth() + 1);
+        let d = DateTime.getDate() > 9 ? DateTime.getDate() : '0' + DateTime.getDate();
+        let h = DateTime.getHours() > 9 ? DateTime.getHours() : '0' + DateTime.getHours();
+        let m = DateTime.getMinutes() > 9 ? DateTime.getMinutes() : '0' + DateTime.getMinutes();
+        let s = DateTime.getSeconds() > 9 ? DateTime.getSeconds() : '0' + DateTime.getSeconds();
+        return y + '-' + M + '-' + d + " " + h + ":" + m + ":" + s;
+    },
+    /**
+     * 得 yyyy-MM-dd 字串
+     * @param {Date} DateTime
+     */
+    DateString: function (DateTime) {
+        if (!isNaN(DateTime)) DateTime = new Date(DateTime);
+        let y = DateTime.getFullYear();
+        let M = DateTime.getMonth() > 8 ? (DateTime.getMonth() + 1) : '0' + (DateTime.getMonth() + 1);
+        let d = DateTime.getDate() > 9 ? DateTime.getDate() : '0' + DateTime.getDate();
+        return y + '-' + M + '-' + d;
+    },
+    /**
+     * 取得 UUID
+     * */
+    UUID: function () {
+        let base = Date.now() * Math.random() % 6 | 0;
+        base = [7, 11, 13, 17, 19, 23][base];
+        let r = [];
+        for (let i = 0; i < 30; i++) {
+            r[i * base % 30] = (Math.random() * 16 | 0).toString(16);
+        }
+        let s = r.join('');
+        return s.substr(0, 8) + '-' + s.substr(8, 4) + '-4' + s.substr(12, 3) + '-' + ((Math.random() * 16 | 0) & 0x3 | 0x8).toString(16) + s.substr(15, 3) + '-' + s.substr(18);
+    }
+};
+
+/**
+ * CyTransfer 控制物件
+ * */
+const CyTransfer = {
+    /**
+     * 繪製 Transfer List 區域
+     * @param {object} TransferSchema
+     */
+    Render: function (TransferSchema) {
+        if (!TransferSchema) {
+            console.error('需要 CyTransfer 的 Schema 設定物件');
+            return;
+        }
+        if (!TransferSchema.TransferID || !document.getElementById(TransferSchema.TransferID)) {
+            console.error('需要 <div id="' + TransferSchema.TransferID + '"></div> DOM元件');
+            return;
+        }
+        CyTransferRender(TransferSchema);
+    },
+    /**
+     * 將 From 與 To 區域清空並放入新的資料
+     * @param {string} TransferID
+     * @param {Array} FromData
+     * @param {Array} ToData
+     */
+    Fill: function (TransferID, FromData, ToData) {
+        if (!FromData) FromData = [];
+        if (!ToData) ToData = [];
+        if (!CySchema[TransferID] || !Array.isArray(FromData) || !Array.isArray(ToData)) {
+            console.error('傳入資料有誤');
+            return;
+        }
+        CyTransferFill(TransferID, FromData, ToData);
+    },
+    /**
+     * 取得 From 的所有項目的顯示文字 Text
+     * @param {any} TransferID
+     */
+    GetFromText: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'from', 'text');
+    },
+    /**
+     * 取得 From 的所有項目的實際值 Value
+     * @param {any} TransferID
+     */
+    GetFromValue: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'from', 'value');
+    },
+    /**
+     * 取得 From 的所有項目的編號 Uid
+     * @param {any} TransferID
+     */
+    GetFromUid: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'from', 'uid');
+    },
+    /**
+     * 取得 To 的所有項目的顯示文字 Text
+     * @param {any} TransferID
+     */
+    GetToText: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'to', 'text');
+    },
+    /**
+     * 取得 To 的所有項目的實際值 Value
+     * @param {any} TransferID
+     */
+    GetToValue: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'to', 'value');
+    },
+    /**
+     * 取得 To 的所有項目的編號 Uid
+     * @param {any} TransferID
+     */
+    GetToUid: function (TransferID) {
+        return CyTransferGetAllData(TransferID, 'to', 'uid');
+    },
+};
 
 window.addEventListener('load', CyLoadingInit);
 window.addEventListener('load', CyIcon.Render);

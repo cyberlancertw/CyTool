@@ -403,6 +403,102 @@ i[data-size]{
     display:none;
 }
 
+/* 傳送清單最外層 */
+.cy-transfer-wrap{
+    display: flex;
+    justify-content: center;
+}
+
+/* 傳送清單標題 */
+.cy-transfer-label-from, .cy-transfer-label-to{
+    font-size: 1.2rem;
+    font-weight: 900;
+    height: 10%;
+    box-sizing: border-box;
+}
+
+/**/
+.cy-transfer-from-wrap, .cy-transfer-to-wrap{
+    width: 42%;
+    height: 100%;
+}
+
+/**/
+.cy-transfer-filter > input{
+    line-height: 1.5;
+    padding: 0.3rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+/* 傳送清單來源區 */
+.cy-transfer-from{
+    padding: 1rem;
+    border: 1px solid black;
+    overflow: auto;
+    height: 90%;
+    box-sizing: border-box;
+}
+
+/* 傳送清單按鈕區 */
+.cy-transfer-button{
+    width: 15%;
+    padding: 1rem;
+}
+
+/* 傳送清單目的區 */
+.cy-transfer-to{
+    padding: 1rem;
+    border: 1px solid black;
+    overflow: auto;
+    height:90%;
+    box-sizing: border-box;
+}
+
+/* 傳送清單項目 */
+.cy-transfer-item{
+    line-height: 1.5;
+    padding: 0.6rem;
+    cursor: pointer;
+}
+
+/* 傳送清單項目因過濾而隱藏 */
+.cy-transfer-item.hidden{
+    display:none;
+}
+
+/* 傳送清單中項目的分隔線 */
+.cy-transfer-from > div:not(:last-child), .cy-transfer-to > div:not(:last-child){
+    border-bottom: 1px solid #fedfe1;
+}
+
+/* 傳送清單中項目的分隔線 */
+.cy-transfer-from > div:not(:first-child), .cy-transfer-to > div:not(:first-child){
+    border-top: 1px solid #fedfe1;
+}
+
+/* 傳送清單項目懸停*/
+.cy-transfer-item:hover{
+    background-color: #bbf5ff;
+}
+
+/* 傳送清單項目選取 */
+.cy-transfer-item.selected{
+    background-color: #abe5ff;
+}
+
+/* 傳送清單項目選取又懸停 */
+.cy-transfer-item.selected:hover{
+    background-color: #9bd5ff;
+}
+
+/* 傳送清單按鈕區外層 */
+.cy-transfer-button-wrap{
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
 /* 藍色按鈕*/
 .btn-blue {
     color: #000000;

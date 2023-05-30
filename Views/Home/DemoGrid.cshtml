@@ -13,6 +13,7 @@
     var app = '/@Context.Request.PathBase';
 
     const gridDemoSchema = {
+        GridID: 'GridDemo',
         PrimaryKey: 'id',
         ReadAfterRender: true,
         Column: [
@@ -124,6 +125,6 @@
         }
     }
     window.addEventListener('load', function(){
-        CyGrid.Render('GridDemo', gridDemoSchema);
+        CyGrid.Render(gridDemoSchema);
     });
 </script>

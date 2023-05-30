@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "示範 CyTransfer";
+}
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div id="demoTransfer"></div>
+
+
+<script>
+const demoTransferSchema = {
+    TransferID: 'demoTransfer',
+    //Width: ['45%', '10%', '45%'],
+    Width: [250, 100, 350],
+    Height: 450,
+    Label: {
+        From: '可選取',
+        To: '已選取'
+    },
+    Button: {
+        Go: true,
+        GoAll: true,
+        Back: true,
+        BackAll: true
+    },
+    Filter: true
+};
+
+
+window.addEventListener('load', function() {
+    CyTransfer.Render(demoTransferSchema);
+
+    let fromData = [
+        { Text: 'John', Value: 'u10221' },
+        { Text: 'Jimmy', Value: 'u19210' },
+        { Text: 'Mary', Value: 'u10293' },
+        { Text: 'Sylvia', Value: 'u12093' },
+        { Text: 'Carl', Value: 'u10215' },
+        { Text: 'Billy', Value: 'u19298' },
+        { Text: 'Drake', Value: 'u10275' },
+        { Text: 'Ellizabeth', Value: 'u12004' },
+        { Text: 'Flora', Value: 'u19271' },
+        { Text: 'Gina', Value: 'u10285' },
+        { Text: 'Henry', Value: 'u12022' }
+    ];
+
+    let toData = [
+        { Text: 'Amelia', Value: 'u13072' },
+        { Text: 'Babara', Value: 'u12893' },
+    ];
+    CyTransfer.Fill('demoTransfer', fromData, toData);
+
+});
+
+</script>
