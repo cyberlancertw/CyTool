@@ -67,6 +67,10 @@ namespace CyTool.Controllers
         {
             return View();
         }
+        public IActionResult DemoTransfer2()
+        {
+            return View();
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -79,6 +83,14 @@ namespace CyTool.Controllers
             SqlInfo info = new SqlInfo();
             List<Student> qryResult = service.QueryStudents(query, info);
             return Json(new { success = info.Success, data = qryResult });
+        }
+
+        [HttpPost]
+        public JsonResult GetStudentScore()
+        {
+            SqlInfo info = new SqlInfo();
+            service.GetStudentScore(info);
+            return Json(new { success = info.Success, fromData = info.ObjectData, toData = info.ObjectData2 });
         }
     }
 }

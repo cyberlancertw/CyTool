@@ -14,6 +14,9 @@
     border-bottom-color: #000000;
     border-bottom-style: solid;
     border-bottom-width: 1px;
+    display: table;
+    width: calc(100% - 1rem);
+    table-layout: fixed;
 }
 
 /* 表格標題列中的欄 */
@@ -34,11 +37,21 @@
     text-align: right;
 }
 
+/* 表格資料主體 */
+.grid-tbody{
+    display: block;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
 /* 表格資料中的列 */
 .grid-tbody > tr {
     border-bottom-color: #dee2e6;
     border-bottom-style: solid;
     border-bottom-width: 1px;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 /* 表格資料中的偶數列 */
@@ -411,24 +424,26 @@ i[data-size]{
 
 /* 傳送清單標題 */
 .cy-transfer-label-from, .cy-transfer-label-to{
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 900;
     height: 10%;
     box-sizing: border-box;
 }
 
-/**/
+/* 傳送清單的來源與目的區外層 */
 .cy-transfer-from-wrap, .cy-transfer-to-wrap{
     width: 42%;
     height: 100%;
 }
 
-/**/
-.cy-transfer-filter > input{
+/* 過濾的查詢輸入框 */
+.cy-transfer-filter-textbox{
     line-height: 1.5;
     padding: 0.3rem;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid gray;
+    border-radius: 0.2rem;
 }
 /* 傳送清單來源區 */
 .cy-transfer-from{

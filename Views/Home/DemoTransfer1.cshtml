@@ -10,18 +10,11 @@
 <script>
 const demoTransferSchema = {
     TransferID: 'demoTransfer',
-    //Width: ['45%', '10%', '45%'],
-    Width: [250, 100, 350],
+    Width: ['45%', '10%', '45%'],
     Height: 450,
     Label: {
         From: '可選取',
         To: '已選取'
-    },
-    Button: {
-        Go: true,
-        GoAll: true,
-        Back: true,
-        BackAll: true
     },
     Filter: true
 };
@@ -31,22 +24,22 @@ window.addEventListener('load', function() {
     CyTransfer.Render(demoTransferSchema);
 
     let fromData = [
-        { Text: 'John', Value: 'u10221' },
-        { Text: 'Jimmy', Value: 'u19210' },
-        { Text: 'Mary', Value: 'u10293' },
-        { Text: 'Sylvia', Value: 'u12093' },
-        { Text: 'Carl', Value: 'u10215' },
-        { Text: 'Billy', Value: 'u19298' },
-        { Text: 'Drake', Value: 'u10275' },
-        { Text: 'Ellizabeth', Value: 'u12004' },
-        { Text: 'Flora', Value: 'u19271' },
-        { Text: 'Gina', Value: 'u10285' },
-        { Text: 'Henry', Value: 'u12022' }
+        { text: 'John', value: 'u10221' },
+        { text: 'Jimmy', value: 'u19210' },
+        { text: 'Mary', value: 'u10293' },
+        { text: 'Sylvia', value: 'u12093' },
+        { text: 'Carl', value: 'u10215' },
+        { text: 'Billy', value: 'u19298' },
+        { text: 'Drake', value: 'u10275' },
+        { text: 'Ellizabeth', value: 'u12004' },
+        { text: 'Flora', value: 'u19271' },
+        { text: 'Gina', value: 'u10285' },
+        { text: 'Henry', value: 'u12022' }
     ];
 
     let toData = [
-        { Text: 'Amelia', Value: 'u13072' },
-        { Text: 'Babara', Value: 'u12893' },
+        { text: 'Amelia', value: 'u13072' },
+        { text: 'Babara', value: 'u12893' },
     ];
     CyTransfer.Fill('demoTransfer', fromData, toData);
 

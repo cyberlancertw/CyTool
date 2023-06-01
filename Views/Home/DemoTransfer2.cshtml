@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "示範 CyTransfer";
+}
+<link rel="stylesheet" href="~/css/CyTool.css" asp-append-version="true" />
+<script src="~/js/CyTool.js" asp-append-version="true"></script>
+
+<div id="demoTransfer2"></div>
+<button class="cy-button btn-blue" onclick="btnSend();">送出</button>
+
+<h2 id="resultFrom" style="color:purple;"></h2>
+<h2 id="resultTo" style="color:brown;"></h2>
+
+<script>
+
+var app = '/@Context.Request.PathBase';
+
+const demoTransferSchema = {
+    TransferID: 'demoTransfer2',
+    Width: [250, 100, 250],
+    Height: 400,
+    Label: {
+        From: '及格學生',
+        To: '不及格學生'
+    },
+    DisableButton: {
+        DisableGo: false,
+        DisableGoAll: true,
+        DisableBack: false,
+        DisableBackAll: true
+    },
+    Filter: true,
+    Event:{
+        BeforeGo: function(){ console.log('傳送給不及格之前的事件');},
+        AfterGo: function () { console.log('傳送給不及格之後的事件'); },
+        BeforeBack: function () { console.log('傳送給及格之前的事件'); },
+        AfterBack: function () { console.log('傳送給及格之前的事件'); }
+    }
+};
+
+
+window.addEventListener('load', function() {
+    CyTransfer.Render(demoTransferSchema);
+
+    fetch(app + 'Home/GetStudentScore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.success) CyTransfer.Fill('demoTransfer2', res.fromData, res.toData);
+    });
+
+});
+
+
+function btnSend(){
+    let fromValues = CyTransfer.GetFromValue('demoTransfer2');
+    let toTexts = CyTransfer.GetToText('demoTransfer2');
+    let msg = '';
+    msg = '及格的學生學號：'
+    for(let i = 0; i < fromValues.length; i++) {
+        msg += fromValues[i] + '、';
+    }
+    document.getElementById('resultFrom').textContent = msg;
+    msg = '不及格的學生名字：';
+    for(let i = 0; i < toTexts.length; i++) {
+        msg += toTexts[i] + '、';
+    }
+    document.getElementById('resultTo').textContent = msg;
+    
+}
+</script>

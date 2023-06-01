@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Options;
 
 namespace CyTool.Models
 {
@@ -37,6 +36,30 @@ namespace CyTool.Models
             }
             return result;
         }
-        
+
+        public void GetStudentScore(SqlInfo info)
+        {
+            List<Item> fromData = null;
+            List<Item> toData = null;
+            string sql = string.Empty;
+
+            try
+            {
+                using (var conn = db.Connection())
+                {
+                    sql = "SELECT [Name] AS [text], [ID] AS [value] FROM dbo.Students WHERE Score >= 60";
+                    fromData = conn.Query<Item>(sql).ToList();
+                    sql = "SELECT [Name] AS [text], [ID] AS [value] FROM dbo.Students WHERE Score < 60";
+                    toData = conn.Query<Item>(sql).ToList();
+                    info.ObjectData = fromData;
+                    info.ObjectData2 = toData;
+                    info.Success = true;
+                }
+            }
+            catch (Exception e)
+            {
+                info.Message = e.Message;
+            }
+        }
     }
 }
